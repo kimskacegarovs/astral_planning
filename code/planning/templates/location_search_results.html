@@ -1,7 +1,7 @@
-<ul>
+<ul class="border border-gray-500 rounded">
 {% for result in search_results %}
-    <li class="{% cycle 'bg-gray-900' 'bg-gray-800' %} hover:bg-gray-500 transition-colors duration-300 rounded">
-        {{ result.display_name }} {{ result.coordinates }}
+    <li class="{% cycle 'bg-gray-700' 'bg-gray-800'%} hover:bg-gray-500 transition-colors duration-300 cursor-pointer">
+        {{ result.display_name }}
     </li>
 {% endfor %}
 </ul>

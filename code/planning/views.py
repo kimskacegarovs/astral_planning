@@ -2,9 +2,8 @@ from django.shortcuts import render, reverse, redirect, HttpResponse
 from django.views.generic import TemplateView, View, FormView
 from .service import PlanningService, PlanningRequest, PlanningFactory
 from .forms import LocationSearchForm
+from .geo_service import GeoService
 import json
-import requests
-from dataclasses import dataclass
 
 
 class PlanningView(TemplateView):
@@ -43,32 +42,9 @@ class CancelPlanningView(View):
         return redirect("resources")
 
 
-@dataclass
-class LocationSearchResult:
-    display_name: str
-    coordinates: str
-
-
-class GeocodingView(FormView):
+class LocationSearchView(FormView):
     form_class = LocationSearchForm
 
     def form_valid(self, form):
-        search = form.cleaned_data["search"]
-        search_results = self.search(search)
+        search_results = GeoService().search(search=form.cleaned_data["search"])
         return render(self.request, "location_search_results.html", {"search_results": search_results})
-
-    def search(self, search: str) -> list[LocationSearchResult]:
-        base_url = "https://nominatim.openstreetmap.org/search"
-        params = {"format": "json", "q": search}
-        response = requests.get(base_url, params=params)
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        results = [
-            LocationSearchResult(
-                display_name=result["display_name"],
-                coordinates=f"{result['lat']}, {result['lon']}"
-            )
-            for result in response.json()
-        ]
-        return results
-
-

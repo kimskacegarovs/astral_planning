@@ -1,7 +1,7 @@
 <div class="flex justify-center">
     <form class="flex justify-center"
-          hx-trigger="keyup[target.value.length >= 3] delay:500ms"
-          hx-post="{% url 'geocoding' %}" hx-target="#search-results">
+          hx-trigger="keyup[target.value.length >= 3] delay:200ms"
+          hx-post="{% url 'location_search' %}" hx-target="#search-results">
         {% csrf_token %}
 
         <div>

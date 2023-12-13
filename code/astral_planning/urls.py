@@ -27,5 +27,5 @@ urlpatterns = [
     path('apply_planning/', planning_views.ApplyPlanningView.as_view(), name='apply_planning'),
     path('cancel_planning/', planning_views.CancelPlanningView.as_view(), name='cancel_planning'),
     path('resources/', planning_views.ResourcesView.as_view(), name='resources'),
-    path('geocoding/', planning_views.GeocodingView.as_view(), name='geocoding'),
+    path('location_search/', planning_views.LocationSearchView.as_view(), name='location_search'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
