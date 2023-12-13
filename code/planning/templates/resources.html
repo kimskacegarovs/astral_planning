@@ -1,0 +1,14 @@
+<div id="resources" class="container mx-auto mt-8 grid">
+    <div>
+        {% include "planned_table.html" with items=planning_set.planned_transports %}
+    </div>
+
+    <div class="grid grid-cols-2 gap-8">
+        {% include "planning_sub_table.html" with title="Transport" items=planning_set.unplanned_transports item_type="transport" %}
+        {% include "planning_sub_table.html" with title="Shipment" items=planning_set.unplanned_shipments item_type="shipment" %}
+    </div>
+</div>
+
+
+{% include "resources_js.html" %}
+{% include "map_js.html" %}

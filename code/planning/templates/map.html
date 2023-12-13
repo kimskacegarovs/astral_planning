@@ -1,0 +1,30 @@
+<style>
+    #map-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 400px;
+        width: 100%;
+        margin: 20px;
+    }
+
+    #mapid {
+        height: 100%;
+        width: 90%;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+</style>
+
+<div id="map-container">
+    <div id="mapid"></div>
+</div>
+
+<script>
+    const mymap = L.map('mapid').setView([41.3775, 64.5853], 6); // Set view to Uzbekistan
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(mymap);
+</script>

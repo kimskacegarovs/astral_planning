@@ -1,0 +1,19 @@
+<div class="table bg-gray-800 rounded-lg p-4 m-4 w-full">
+    <table class="table-auto w-full">
+        <thead>
+        <tr>
+            <th class="px-4 py-2">{{ title }}</th>
+        </tr>
+        </thead>
+        <tbody class="table-content droppable">
+        {% for item in items %}
+            <tr>
+                <td class="item draggable bg-gray-700 p-2 rounded mb-2 cursor-move text-center"
+                    draggable="true" id="{{ item.id }}" data-item-type="{{ item_type }}">
+                    {{ item.name }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

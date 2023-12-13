@@ -1,0 +1,31 @@
+<div class="flex justify-center">
+    <form class="flex justify-center"
+          hx-trigger="keyup[target.value.length >= 3] delay:500ms"
+          hx-post="{% url 'geocoding' %}" hx-target="#search-results">
+        {% csrf_token %}
+
+        <div>
+            {% for field in location_search_form %}
+                <div class="flex justify-center">
+                    <input type="{{ field.field.widget.input_type }}"
+                           name="{{ field.html_name }}"
+                           id="{{ field.id_for_label }}"
+                           class="bg-gray-600 text-white rounded-md px-4 py-2 placeholder-gray-400 w-full"
+                           placeholder="{{ field.label }}"
+                           {% if field.value %}value="{{ field.value }}"{% endif %}
+                           {% if field.field.required %}required{% endif %}>
+                </div>
+            {% endfor %}
+
+            <div id="search-results" class="absolute bg-gray-900 mt-1 w-full max-w-md z-10 rounded">
+                <!-- Search results will be displayed here -->
+            </div>
+        </div>
+
+        <div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white ml-1 py-1 px-1 rounded">
+                Search
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,111 @@
+<script>
+    var coordinatesRawPlannedTransport = [
+        {% for item in planning_set.planned_transports %}
+            "{{ item.location.coordinates }}",
+        {% endfor %}
+    ];
+    var coordinatesRawPlannedShipments = [
+        {% for item in planning_set.planned_transports %}
+            "{{ item.planned_shipment.location.coordinates }}",
+        {% endfor %}
+    ];
+    var coordinatesRawTransport = [
+        {% for item in planning_set.unplanned_transports %}
+            "{{ item.location.coordinates }}",
+        {% endfor %}
+    ];
+    var coordinatesRawShipments = [
+        {% for item in planning_set.unplanned_shipments %}
+            "{{ item.location.coordinates }}",
+        {% endfor %}
+    ];
+    var plannedLines = [
+        {% for item in planning_set.planned_transports %}
+            [
+                "{{ item.location.coordinates }}",
+                "{{ item.planned_shipment.location.coordinates }}"
+            ],
+        {% endfor %}
+    ];
+
+    function getConvertedCoordinates(coordinatesRaw) {
+        return coordinatesRaw.map(coordStr => {
+            const cleanedStr = coordStr.replace(/[()]/g, '');
+            const [latitude, longitude] = cleanedStr.split(',').map(coord => parseFloat(coord.trim()));
+            return [latitude, longitude];
+        });
+    }
+
+    function removeExistingMapLayers() {
+        mymap.eachLayer(function (layer) {
+            if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+                mymap.removeLayer(layer);
+            }
+        });
+    }
+
+    var mapMarkerEmojis = {
+        plannedTransport: '🚚',
+        plannedShipment: '🎁',
+        transport: '🚛',
+        shipment: '📦',
+    }
+
+    function getEmojiIcon(emoji) {
+        return L.divIcon({
+            html: emoji,
+            iconSize: [40, 40],
+            iconAnchor: [12, 24],
+            className: 'transparent-marker'
+        });
+    }
+
+    var mapMaprkerIcons = {
+        plannedTransport: getEmojiIcon(mapMarkerEmojis.plannedTransport),
+        plannedShipment: getEmojiIcon(mapMarkerEmojis.plannedShipment),
+        transport: getEmojiIcon(mapMarkerEmojis.transport),
+        shipment: getEmojiIcon(mapMarkerEmojis.shipment),
+    }
+
+    function addMapMarkerPopup(rawCoordinates, markerEmoji) {
+        const coordinatesArray = getConvertedCoordinates(rawCoordinates)
+        coordinatesArray.forEach(function (coord) {
+            L.marker(coord, {icon: markerEmoji}).addTo(mymap);
+        });
+    }
+
+    function addMapLines(rawCoordinates) {
+        rawCoordinates.forEach((rawC) => {
+            const coordinatesArray = getConvertedCoordinates(rawC)
+            const randomColor = getRandomColor();
+            L.polyline(coordinatesArray, {color: randomColor}).addTo(mymap);
+        })
+    }
+
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function setMap() {
+        removeExistingMapLayers()
+        addMapMarkerPopup(coordinatesRawPlannedTransport, mapMaprkerIcons.plannedTransport)
+        addMapMarkerPopup(coordinatesRawPlannedShipments, mapMaprkerIcons.plannedShipment)
+        addMapMarkerPopup(coordinatesRawTransport, mapMaprkerIcons.transport)
+        addMapMarkerPopup(coordinatesRawShipments, mapMaprkerIcons.shipment)
+        addMapLines(plannedLines)
+    }
+
+    setMap()
+</script>
+
+<style>
+    .transparent-marker {
+        opacity: 0.8;
+        font-size: large;
+    }
+</style>
