@@ -12,20 +12,6 @@
                 <!-- Search results will be displayed here -->
             </div>
         </div>
-
-        <div>
-            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white ml-1 py-1 px-1 rounded">
-                Search
-            </button>
-        </div>
+        <div>{% include "btn.html" with text="Search" %}</div>
     </form>
-</div>
-
-
-<div class="flex justify-center">
-    {% for field in location_form %}
-        <div>
-            {{ field }}
-        </div>
-    {% endfor %}
 </div>

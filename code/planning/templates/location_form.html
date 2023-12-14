@@ -1,0 +1,15 @@
+<div id="location-form-container">
+    <form>
+        {% csrf_token %}
+        <div class="flex justify-center">
+            {% for field in location_form %}
+                <div>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <div>{% include "btn.html" with text="Submit" %}</div>
+        </div>
+    </form>
+    {% include "location_search.html" %}
+
+</div>

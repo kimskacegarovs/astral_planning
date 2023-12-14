@@ -54,8 +54,7 @@ class LocationSearchView(FormView):
 
 class LocationSearchResultSelectView(View):
     def post(self, request, *args, **kwargs):
-        self.request.session["selected_result"] = self.request.POST["result"]
-        # selected_result = LocationSearchResult.from_json(self.request.POST["result"])
-        # print(">>>>>>>>>>>")
-        # print(selected_result)
-        # print(type(selected_result))
+        result = LocationSearchResult.from_json(self.request.POST["result"])
+        form = LocationForm(initial={"location": result.display_name, "coordinates": result.coordinates})
+        context = {"location_form": form, "location_search_form": LocationSearchForm()}
+        return render(self.request, "location_form.html", context)

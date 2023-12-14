@@ -35,8 +35,7 @@
       hx-target="#resources">
     {% csrf_token %}
 </form>
- {% include "location_search.html" %}
-
+{% include "location_form.html" %}
 <div hx-get="{% url "resources" %}" hx-trigger="load"></div>
 </body>
 </html>
