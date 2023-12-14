@@ -18,10 +18,12 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
+from django_view_decorator import include_view_urls
 from planning import views as planning_views
 
 
 urlpatterns = [
+    path("", include_view_urls()),
     path('admin/', admin.site.urls),
     path('planning/', planning_views.PlanningView.as_view(), name='planning'),
     path('apply_planning/', planning_views.ApplyPlanningView.as_view(), name='apply_planning'),

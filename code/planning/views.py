@@ -1,9 +1,11 @@
 from django.shortcuts import render, reverse, redirect, HttpResponse
 from django.views.generic import TemplateView, View, FormView
 from .service import PlanningService, PlanningRequest, PlanningFactory
-from .forms import LocationSearchForm, LocationForm
+from .models import Transport, Shipment, Location  # TODO Move to service
+from .forms import LocationSearchForm, LocationForm, DeleteEntityForm
 from .geo_service import GeoService
-from .types import LocationSearchResult
+from .types import LocationSearchResult, EntityType
+from django_view_decorator import view
 import json
 
 
@@ -58,3 +60,34 @@ class LocationSearchResultSelectView(View):
         form = LocationForm(initial={"location": result.display_name, "coordinates": result.coordinates})
         context = {"location_form": form, "location_search_form": LocationSearchForm()}
         return render(self.request, "location_form.html", context)
+
+
+@view(paths="location_form", name="location_form")
+class LocationFormView(FormView):
+    form_class = LocationForm
+
+    def form_valid(self, form):
+        lat, lng = form.cleaned_data["coordinates"].split(",")
+        location = Location.objects.create(latitude=lat, longitude=lng)
+
+        match EntityType(form.cleaned_data["entity_type"]):
+            case EntityType.SHIPMENT:
+                Shipment.objects.create(location=location, name=form.cleaned_data["name"])
+            case EntityType.TRANSPORT:
+                Transport.objects.create(location=location, name=form.cleaned_data["name"])
+
+        return redirect("resources")
+
+
+@view(paths="delete", name="delete")
+class DeleteEntityView(FormView):
+    form_class = DeleteEntityForm
+
+    def form_valid(self, form):
+        match EntityType(form.cleaned_data["entity_type"]):
+            case EntityType.SHIPMENT:
+                Shipment.objects.filter(id=form.cleaned_data["id"]).delete()
+            case EntityType.TRANSPORT:
+                Transport.objects.filter(id=form.cleaned_data["id"]).delete()
+
+        return redirect("resources")

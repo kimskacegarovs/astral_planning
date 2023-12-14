@@ -20,9 +20,9 @@ class Location(BaseModel):
         return self.latitude, self.longitude
 
     def validate_coordinates(self):
-        if self.latitude < -90 or self.latitude > 90:
+        if float(self.latitude) < -90 or float(self.latitude) > 90:
             raise ValueError("Latitude must be in range [-90, 90]")
-        if self.longitude < -180 or self.longitude > 180:
+        if float(self.longitude) < -180 or float(self.longitude) > 180:
             raise ValueError("Longitude must be in range [-180, 180]")
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):

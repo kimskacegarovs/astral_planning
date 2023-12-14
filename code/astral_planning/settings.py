@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'planning.apps.PlanningConfig',
+    'django_view_decorator',
 ]
 
 MIDDLEWARE = [

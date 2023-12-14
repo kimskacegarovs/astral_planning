@@ -1,4 +1,5 @@
 from django import forms
+from .types import EntityType
 
 
 class CSSClasses:
@@ -45,6 +46,12 @@ class LocationSearchForm(forms.Form):
 
 
 class LocationForm(forms.Form):
-    entity_type = ChoiceField(placeholder="Type", choices=[("transport", "Transport"), ("shipment", "Shipment")])
+    entity_type = ChoiceField(placeholder="Type", choices=EntityType.choices())
+    name = CharField(placeholder="Name")
     location = CharField(placeholder="Location")
     coordinates = CharField(placeholder="Coordinates")
+
+
+class DeleteEntityForm(forms.Form):
+    entity_type = ChoiceField(placeholder="Type", choices=EntityType.choices())
+    id = CharField(placeholder="ID")
