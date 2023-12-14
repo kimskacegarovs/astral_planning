@@ -1,7 +1,11 @@
 <ul class="border border-gray-500 rounded">
-{% for result in search_results %}
-    <li class="{% cycle 'bg-gray-700' 'bg-gray-800'%} hover:bg-gray-500 transition-colors duration-300 cursor-pointer">
-        {{ result.display_name }}
-    </li>
-{% endfor %}
+    {% for result in search_results %}
+        <form hx-trigger="click" hx-post="{% url "location_search_result_select" %}">
+            {% csrf_token %}
+            <li class="{% cycle 'bg-gray-700' 'bg-gray-800' %} hover:bg-gray-500 transition-colors duration-300 cursor-pointer">
+                {{ result.display_name }}
+            </li>
+            <input type="hidden" name="result" value="{{ result.as_json }}">
+        </form>
+    {% endfor %}
 </ul>

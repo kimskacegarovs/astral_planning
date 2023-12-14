@@ -1,8 +1,9 @@
 from django.shortcuts import render, reverse, redirect, HttpResponse
 from django.views.generic import TemplateView, View, FormView
 from .service import PlanningService, PlanningRequest, PlanningFactory
-from .forms import LocationSearchForm
+from .forms import LocationSearchForm, LocationForm
 from .geo_service import GeoService
+from .types import LocationSearchResult
 import json
 
 
@@ -12,6 +13,7 @@ class PlanningView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["apply_planning_url"] = reverse("apply_planning")
+        context["location_form"] = LocationForm()
         context["location_search_form"] = LocationSearchForm()
         return context
 
@@ -48,3 +50,12 @@ class LocationSearchView(FormView):
     def form_valid(self, form):
         search_results = GeoService().search(search=form.cleaned_data["search"])
         return render(self.request, "location_search_results.html", {"search_results": search_results})
+
+
+class LocationSearchResultSelectView(View):
+    def post(self, request, *args, **kwargs):
+        self.request.session["selected_result"] = self.request.POST["result"]
+        # selected_result = LocationSearchResult.from_json(self.request.POST["result"])
+        # print(">>>>>>>>>>>")
+        # print(selected_result)
+        # print(type(selected_result))

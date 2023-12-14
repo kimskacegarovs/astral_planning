@@ -6,17 +6,8 @@
 
         <div>
             {% for field in location_search_form %}
-                <div class="flex justify-center">
-                    <input type="{{ field.field.widget.input_type }}"
-                           name="{{ field.html_name }}"
-                           id="{{ field.id_for_label }}"
-                           class="bg-gray-600 text-white rounded-md px-4 py-2 placeholder-gray-400 w-full"
-                           placeholder="{{ field.label }}"
-                           {% if field.value %}value="{{ field.value }}"{% endif %}
-                           {% if field.field.required %}required{% endif %}>
-                </div>
+                {{ field }}
             {% endfor %}
-
             <div id="search-results" class="absolute bg-gray-900 mt-1 w-full max-w-md z-10 rounded">
                 <!-- Search results will be displayed here -->
             </div>
@@ -28,4 +19,13 @@
             </button>
         </div>
     </form>
+</div>
+
+
+<div class="flex justify-center">
+    {% for field in location_form %}
+        <div>
+            {{ field }}
+        </div>
+    {% endfor %}
 </div>

@@ -3,11 +3,13 @@ from .types import LocationSearchResult
 
 
 class OpenStreetMapGeocodingService:
+    BASE_URL = "https://nominatim.openstreetmap.org"
+
     def search(self, search: str) -> list[LocationSearchResult]:
-        base_url = "https://nominatim.openstreetmap.org/search"
+        url = f"{self.BASE_URL}/search"
         params = {"format": "json", "q": search}
-        response = requests.get(base_url, params=params)
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        response = requests.get(url, params=params)
+        response.raise_for_status()
         results = [
             LocationSearchResult(
                 display_name=result["display_name"],
@@ -16,5 +18,3 @@ class OpenStreetMapGeocodingService:
             for result in response.json()
         ]
         return results
-
-
