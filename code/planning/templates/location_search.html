@@ -3,7 +3,6 @@
           hx-trigger="keyup[target.value.length >= 3] delay:200ms"
           hx-post="{% url 'location_search' %}" hx-target="#search-results">
         {% csrf_token %}
-
         <div>
             {% for field in location_search_form %}
                 {{ field }}

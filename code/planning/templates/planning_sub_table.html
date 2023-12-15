@@ -10,7 +10,7 @@
             <tr>
                 <td class="item draggable bg-gray-700 p-2 rounded mb-2 cursor-move text-center"
                     draggable="true" id="{{ item.id }}" data-item-type="{{ item_type }}">
-                    {{ item.name }} {{ item.location.coordinates }}
+                    {{ item.name }} {{ item. }}
                 </td>
                 <td>
                     <form hx-post="{% url "delete" %}" hx-target="#resources">

@@ -30,9 +30,4 @@ urlpatterns = [
     path('cancel_planning/', planning_views.CancelPlanningView.as_view(), name='cancel_planning'),
     path('resources/', planning_views.ResourcesView.as_view(), name='resources'),
     path('location_search/', planning_views.LocationSearchView.as_view(), name='location_search'),
-    path(
-        'location_search_result_select/',
-        planning_views.LocationSearchResultSelectView.as_view(),
-        name='location_search_result_select'
-    ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
