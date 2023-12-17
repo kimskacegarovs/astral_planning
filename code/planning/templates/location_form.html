@@ -1,4 +1,4 @@
-<div id="location-form-container">
+<div id="location-form-container" class="flex justify-center">
     <form id="location-form" hx-post="{% url "location_form" %}" hx-target="#resources">
         {% csrf_token %}
         <div class="flex justify-center">

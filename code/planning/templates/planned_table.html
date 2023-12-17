@@ -44,8 +44,8 @@
                     <form method="post" class="pl-2" hx-post="{% url 'cancel_planning' %}" hx-target="#resources">
                         {% csrf_token %}
                         <input type="hidden" name="planning_id" value="{{ item.id }}">
-                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
-                            Cancel
+                        <button type="submit" class="bg-red-400 hover:bg-red-600 text-white py-2 px-4 rounded">
+                            X
                         </button>
                     </form>
                 </div>

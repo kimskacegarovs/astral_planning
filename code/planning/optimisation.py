@@ -5,10 +5,11 @@ from .geo_service import GeoService
 from .types import RoutePolylineInput
 from django.db.models import QuerySet
 import concurrent.futures
+from geopy.distance import geodesic
 
 
 class PlanningOptimisationService:
-    MAX_EMPTY_KM = 500
+    MAX_EMPTY_KM = 3_000
 
     def optimal_resource_allocation(self, transports: QuerySet[Transport], shipments: QuerySet[Shipment]):
         num_transports = len(transports)
@@ -65,13 +66,12 @@ class PlanningOptimisationService:
         distance_km = round(route.distance_km)
         return distance_km
 
-    def calculate_distance_euclidian(self, transport: Transport, shipment: Shipment):
-        transport_location = np.array(transport.location.coordinates)
-        order_location = np.array(shipment.location.coordinates)
-        diff = transport_location - order_location
-        distance = np.linalg.norm(diff)
+    def calculate_distance_geopy(self, transport: Transport, shipment: Shipment):
+        transport_location = transport.location
+        order_location = shipment.location
+        distance = geodesic(transport_location.coordinates, order_location.coordinates).km
         return round(distance)
 
 
 # Change this to switch between the methods
-CALCULATE_DISTANCE_METHOD = PlanningOptimisationService.calculate_distance_euclidian
+CALCULATE_DISTANCE_METHOD = PlanningOptimisationService.calculate_distance_geopy

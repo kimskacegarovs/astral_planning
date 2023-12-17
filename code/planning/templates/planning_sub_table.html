@@ -7,12 +7,12 @@
         </thead>
         <tbody class="table-content droppable">
         {% for item in items %}
-            <tr>
-                <td class="item draggable bg-gray-700 p-2 rounded mb-2 cursor-move text-center"
+            <tr class="flex">
+                <td class="item draggable bg-gray-700 p-2 rounded mb-2 cursor-move text-center w-full"
                     draggable="true" id="{{ item.id }}" data-item-type="{{ item_type }}">
                     {{ item.name }} ({{ item.location.address }})
                 </td>
-                <td>
+                <td class="flex-auto">
                     <form hx-post="{% url "delete" %}" hx-target="#resources">
                         {% csrf_token %}
                         <input type="hidden" name="entity_type" value="{{ item_type }}">
