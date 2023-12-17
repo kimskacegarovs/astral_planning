@@ -1,6 +1,6 @@
 from django.shortcuts import render, reverse, redirect, HttpResponse
 from django.views.generic import TemplateView, View, FormView
-from .service import PlanningService, PlanningRequest, PlanningFactory
+from .service import PlanningService, PlanningRequest
 from .models import Transport, Shipment, Location  # TODO Move to service
 from .forms import LocationSearchForm, LocationForm, DeleteEntityForm
 from .geo_service import GeoService

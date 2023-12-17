@@ -36,9 +36,7 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=100)),
                 (
                     "plannings",
-                    models.ManyToManyField(
-                        through="planning.Planning", to="planning.shipment"
-                    ),
+                    models.ManyToManyField(through="planning.Planning", to="planning.shipment"),
                 ),
             ],
             options={
@@ -48,15 +46,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="planning",
             name="shipment",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="planning.shipment"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="planning.shipment"),
         ),
         migrations.AddField(
             model_name="planning",
             name="transport",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="planning.transport"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="planning.transport"),
         ),
     ]

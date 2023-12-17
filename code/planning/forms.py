@@ -8,10 +8,10 @@ class CSSClasses:
 
 class CustomWidgetMixin:
     def __init__(self, *args, **kwargs):
-        attrs = kwargs.get('attrs', {})
-        attrs.setdefault('class', CSSClasses.DEFAULT)
-        attrs.setdefault('placeholder', kwargs.pop('placeholder', ''))
-        kwargs['attrs'] = attrs
+        attrs = kwargs.get("attrs", {})
+        attrs.setdefault("class", CSSClasses.DEFAULT)
+        attrs.setdefault("placeholder", kwargs.pop("placeholder", ""))
+        kwargs["attrs"] = attrs
         super().__init__(*args, **kwargs)
 
 
@@ -27,17 +27,13 @@ class SelectWidget(CustomWidgetMixin, forms.Select):
 
 class CharField(forms.CharField):
     def __init__(self, *args, **kwargs):
-        kwargs["widget"] = TextWidget(
-            placeholder=kwargs.pop('placeholder', '')
-        )
+        kwargs["widget"] = TextWidget(placeholder=kwargs.pop("placeholder", ""))
         super().__init__(*args, **kwargs)
 
 
 class ChoiceField(forms.ChoiceField):
     def __init__(self, *args, **kwargs):
-        kwargs["widget"] = SelectWidget(
-            placeholder=kwargs.pop('placeholder', '')
-        )
+        kwargs["widget"] = SelectWidget(placeholder=kwargs.pop("placeholder", ""))
         super().__init__(*args, **kwargs)
 
 

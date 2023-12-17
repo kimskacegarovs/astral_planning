@@ -25,7 +25,7 @@ class PlanningFactory:
     def transport_factory(self, k: int):
         for i in range(k):
             location = Location().create_random_location()
-            transport = Transport(name=f"Transport {i}", location=location).save()
+            Transport(name=f"Transport {i}", location=location).save()
 
     def shipment_factory(self, k: int):
         for i in range(k):
@@ -59,7 +59,7 @@ class PlanningService:
             planned_transports=planned_transports,
             unplanned_transports=unplanned_transports,
             unplanned_shipments=unplanned_shipments,
-            routes=routes
+            routes=routes,
         )
 
     def get_planning_polylines(self, planning_set: PlanningSet):
@@ -85,7 +85,7 @@ class PlanningService:
             start_lat=transport.location.latitude,
             start_lon=transport.location.longitude,
             end_lat=shipment.location.latitude,
-            end_lon=shipment.location.longitude
+            end_lon=shipment.location.longitude,
         )
         if self.OPEN_ROUTE_SERVICE_USED:
             route = GeoService().get_route(route_input=route_input)
@@ -95,8 +95,7 @@ class PlanningService:
         planning_set = self.get_planning_set()
         optimal_planning = PlanningOptimisationService().optimal_resource_allocation(
             transports=planning_set.unplanned_transports,
-            shipments=planning_set.unplanned_shipments
+            shipments=planning_set.unplanned_shipments,
         )
         for transport, shipment in optimal_planning.items():
             self.apply_planning(PlanningRequest(transport_id=transport.id, shipment_id=shipment.id))
-

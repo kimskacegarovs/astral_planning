@@ -15,7 +15,7 @@ class OpenStreetMapGeocodingService:
         results = [
             LocationSearchResult(
                 display_name=result["display_name"],
-                coordinates=f"{result['lat']}, {result['lon']}"
+                coordinates=f"{result['lat']}, {result['lon']}",
             )
             for result in response.json()
         ]
@@ -41,7 +41,7 @@ class OpenRouteService:
         return routes
 
     def get_polyline_array(self, data) -> RoutePolylineOutput:
-        geometry = data['routes'][0]['geometry']
+        geometry = data["routes"][0]["geometry"]
         polyline_coords = openrouteservice.convert.decode_polyline(geometry)["coordinates"]
 
         # swap lat and lon using numpy

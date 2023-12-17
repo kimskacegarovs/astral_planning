@@ -42,12 +42,14 @@ class PlanningOptimisationService:
     def calculate_distance_geoservice(self, transport: Transport, shipment: Shipment):
         transport_location = transport.location
         order_location = shipment.location
-        route = GeoService().get_route(RoutePolylineInput(
-            start_lat=transport_location.latitude,
-            start_lon=transport_location.longitude,
-            end_lat=order_location.latitude,
-            end_lon=order_location.longitude
-        ))
+        route = GeoService().get_route(
+            RoutePolylineInput(
+                start_lat=transport_location.latitude,
+                start_lon=transport_location.longitude,
+                end_lat=order_location.latitude,
+                end_lon=order_location.longitude,
+            )
+        )
         distance_km = route.distance_km
         print(f"Distance: {distance_km} for {transport} and {shipment}")
         return distance_km

@@ -24,10 +24,10 @@ from planning import views as planning_views
 
 urlpatterns = [
     path("", include_view_urls()),
-    path('admin/', admin.site.urls),
-    path('planning/', planning_views.PlanningView.as_view(), name='planning'),
-    path('apply_planning/', planning_views.ApplyPlanningView.as_view(), name='apply_planning'),
-    path('cancel_planning/', planning_views.CancelPlanningView.as_view(), name='cancel_planning'),
-    path('resources/', planning_views.ResourcesView.as_view(), name='resources'),
-    path('location_search/', planning_views.LocationSearchView.as_view(), name='location_search'),
+    path("admin/", admin.site.urls),
+    path("planning/", planning_views.PlanningView.as_view(), name="planning"),
+    path("apply_planning/", planning_views.ApplyPlanningView.as_view(), name="apply_planning"),
+    path("cancel_planning/", planning_views.CancelPlanningView.as_view(), name="cancel_planning"),
+    path("resources/", planning_views.ResourcesView.as_view(), name="resources"),
+    path("location_search/", planning_views.LocationSearchView.as_view(), name="location_search"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

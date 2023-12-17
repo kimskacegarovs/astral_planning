@@ -37,7 +37,7 @@ class Location(BaseModel):
 
         instance = cls(
             latitude=random.uniform(*uzbekistan_latitude_range),
-            longitude=random.uniform(*uzbekistan_longitude_range)
+            longitude=random.uniform(*uzbekistan_longitude_range),
         )
         instance.save()
         return instance
@@ -54,7 +54,7 @@ class Shipment(BaseModel):
 
 class Transport(BaseModel):
     name = models.CharField(max_length=100)
-    plannings = models.ManyToManyField(Shipment, through='Planning')
+    plannings = models.ManyToManyField(Shipment, through="Planning")
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
 
     def assign_shipment(self, shipment: Shipment, route: "Route" = None) -> "Planning":
