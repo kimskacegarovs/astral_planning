@@ -26,7 +26,6 @@ class PlanningFactory:
         for i in range(k):
             location = Location().create_random_location()
             transport = Transport(name=f"Transport {i}", location=location).save()
-            print(location, transport)
 
     def shipment_factory(self, k: int):
         for i in range(k):
@@ -45,7 +44,7 @@ class PlanningFactory:
 
 
 class PlanningService:
-    OPEN_ROUTE_SERVICE_USED = True
+    OPEN_ROUTE_SERVICE_USED = True  # TODO Move to settings
 
     def get_planning_set(self) -> PlanningSet:
         plannings = Planning.objects.all().prefetch_related("transport", "shipment")
@@ -62,6 +61,12 @@ class PlanningService:
             unplanned_shipments=unplanned_shipments,
             routes=routes
         )
+
+    def get_planning_polylines(self, planning_set: PlanningSet):
+        polylines = []
+        for route in planning_set.routes:
+            polylines.append(route.polyline_array)
+        return polylines
 
     def apply_planning(self, planning_request: PlanningRequest):
         with Timer(method=self.apply_planning.__qualname__):
@@ -82,12 +87,9 @@ class PlanningService:
             end_lat=shipment.location.latitude,
             end_lon=shipment.location.longitude
         )
-        route_polyline = []
         if self.OPEN_ROUTE_SERVICE_USED:
-            # TODO Make this an async job
-            route_polyline = GeoService().get_route_polyline(route_input=route_input)
-
-        return Route.objects.create(polyline=route_polyline)
+            route = GeoService().get_route(route_input=route_input)
+            return Route.objects.create(polyline=route.polyline, distance_km=route.distance_km)
 
     def apply_optimal_planning(self):
         planning_set = self.get_planning_set()

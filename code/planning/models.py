@@ -70,6 +70,7 @@ class Transport(BaseModel):
 
 class Route(BaseModel):
     polyline = models.TextField()
+    distance_km = models.FloatField(null=True)
 
     @property
     def polyline_array(self):

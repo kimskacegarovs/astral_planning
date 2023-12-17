@@ -6,7 +6,7 @@ from .forms import LocationSearchForm, LocationForm, DeleteEntityForm
 from .geo_service import GeoService
 from .types import LocationSearchResult, EntityType
 from django_view_decorator import view
-from .optimisation import PlanningOptimisationService
+from utils import Timer
 import json
 
 
@@ -26,7 +26,9 @@ class ResourcesView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["planning_set"] = PlanningService().get_planning_set()
+        planning_set = PlanningService().get_planning_set()
+        context["planning_set"] = planning_set
+        context["planning_polylines"] = PlanningService().get_planning_polylines(planning_set)
         return context
 
 
@@ -104,5 +106,6 @@ class DeleteEntityView(FormView):
 @view(paths="apply_optimised_planning", name="apply_optimised_planning")
 class ApplyOptimisedPlanningView(View):
     def post(self, request, *args, **kwargs):
-        PlanningService().apply_optimal_planning()
-        return redirect("resources")
+        with Timer(method=self.post.__qualname__):
+            PlanningService().apply_optimal_planning()
+            return redirect("resources")

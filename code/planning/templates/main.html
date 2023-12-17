@@ -27,6 +27,7 @@
         }
 
         .htmx-indicator {
+            display: none;
             opacity: 0; /* Initially hidden */
             transition: opacity 0.3s ease-in-out; /* Smooth transition */
         }
@@ -53,19 +54,11 @@
       hx-target="#resources">
     {% csrf_token %}
 </form>
+
 {% include "location_form.html" %}
 
-<div class="flex justify-center">
-    <form hx-post="{% url "apply_optimised_planning" %}"
-          hx-target="#resources"
-          hx-swap="outerHTML"
-          hx-indicator="#indicator"
-    >
-        {% csrf_token %}
-        {% include "btn.html" with text="Optimise planning" margin=4 %}
-    </form>
-</div>
+{% include "loading_indicator.html" with id="loading-resources" %}
 
-<div hx-get="{% url "resources" %}" hx-trigger="load"></div>
+<div hx-get="{% url "resources" %}" hx-indicator="#loading-resources" hx-trigger="load"></div>
 </body>
 </html>

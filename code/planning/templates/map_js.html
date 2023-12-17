@@ -19,19 +19,7 @@
             "{{ item.location.coordinates }}",
         {% endfor %}
     ];
-    var plannedLines = [
-        {% for route in planning_set.routes %}
-            [
-                {% for segment in route.polyline_array %}
-                    [
-                        {% for i in segment %}
-                            {{ i }},
-                        {% endfor %}
-                    ],
-                {% endfor %}
-            ],
-        {% endfor %}
-    ];
+    var plannedLines = JSON.parse('{{ planning_polylines }}');
 
     function getConvertedCoordinates(coordinatesRaw) {
         return coordinatesRaw.map(coordStr => {

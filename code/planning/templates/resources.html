@@ -3,6 +3,17 @@
         {% include "planned_table.html" with items=planning_set.planned_transports %}
     </div>
 
+
+<div class="flex justify-center">
+    <form hx-post="{% url "apply_optimised_planning" %}"
+          hx-target="#resources"
+          hx-swap="outerHTML"
+          hx-indicator="#loading-resources">
+        {% csrf_token %}
+        {% include "btn.html" with text="Optimise planning" margin=4 %}
+    </form>
+</div>
+
     <div class="grid grid-cols-2 gap-8">
         {% include "planning_sub_table.html" with title="Transport" items=planning_set.unplanned_transports item_type="transport" %}
         {% include "planning_sub_table.html" with title="Shipment" items=planning_set.unplanned_shipments item_type="shipment" %}

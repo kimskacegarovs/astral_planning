@@ -1,8 +1,10 @@
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 from .models import Shipment, Transport
+from .geo_service import GeoService
+from .types import RoutePolylineInput
 from django.db.models import QuerySet
-
+import concurrent.futures
 
 
 class PlanningOptimisationService:
@@ -11,9 +13,17 @@ class PlanningOptimisationService:
         num_orders = len(shipments)
         cost_matrix = np.zeros((num_transports, num_orders))
 
-        for i in range(num_transports):
-            for j in range(num_orders):
-                cost_matrix[i][j] = self.calculate_cost(transports[i], shipments[j])
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = {
+                executor.submit(self.calculate_cost, transport, shipment): (i, j)
+                for i, transport in enumerate(transports)
+                for j, shipment in enumerate(shipments)
+            }
+
+            for future in concurrent.futures.as_completed(futures):
+                i, j = futures[future]
+                cost = future.result()
+                cost_matrix[i][j] = cost
 
         # Use the Hungarian algorithm to find the optimal assignment.
         row_indices, col_indices = linear_sum_assignment(cost_matrix)
@@ -26,8 +36,21 @@ class PlanningOptimisationService:
         return allocation
 
     def calculate_cost(self, transport: Transport, shipment: Shipment):
-        distance = CALCULATE_DISTANCE_METHOD(self, transport, shipment)
+        distance = self.calculate_distance_geoservice(transport, shipment)  # Or another method
         return distance
+
+    def calculate_distance_geoservice(self, transport: Transport, shipment: Shipment):
+        transport_location = transport.location
+        order_location = shipment.location
+        route = GeoService().get_route(RoutePolylineInput(
+            start_lat=transport_location.latitude,
+            start_lon=transport_location.longitude,
+            end_lat=order_location.latitude,
+            end_lon=order_location.longitude
+        ))
+        distance_km = route.distance_km
+        print(f"Distance: {distance_km} for {transport} and {shipment}")
+        return distance_km
 
     def calculate_distance_euclidian(self, transport: Transport, shipment: Shipment):
         transport_location = np.array(transport.location.coordinates)
@@ -37,4 +60,4 @@ class PlanningOptimisationService:
         return distance
 
 
-CALCULATE_DISTANCE_METHOD = PlanningOptimisationService.calculate_distance_euclidian
+CALCULATE_DISTANCE_METHOD = PlanningOptimisationService.calculate_distance_geoservice

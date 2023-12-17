@@ -43,3 +43,9 @@ class RoutePolylineInput:
 @dataclass
 class RoutePolylineOutput:
     polyline = list[list[float, float]]
+
+
+@dataclass
+class RouteResponse:
+    polyline: RoutePolylineOutput
+    distance_km: float
