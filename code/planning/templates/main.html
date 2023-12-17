@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/htmx.org/dist/htmx.js"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/morphdom-swap.js"></script>
 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -24,16 +25,31 @@
             border-collapse: separate;
             border-spacing: 0 8px;
         }
+
+        .htmx-indicator {
+            opacity: 0; /* Initially hidden */
+            transition: opacity 0.3s ease-in-out; /* Smooth transition */
+        }
+
+        .htmx-request .htmx-indicator {
+            opacity: 1; /* Display when making a request */
+        }
+
+        .htmx-request.htmx-indicator {
+            display: inline;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
 {% include "map.html" %}
 {% include "planning_js.html" %}
+
 <form hidden id="planning-form"
       hx-post="{% url 'apply_planning' %}"
       hx-vals="js: planning_request"
       hx-trigger="click"
-      hx-swap="transition: true; settle: true;"
+      hx-swap="transition: true; swap: true; settle: true;"
+      hx-indicator="#indicator"
       hx-target="#resources">
     {% csrf_token %}
 </form>

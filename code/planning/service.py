@@ -3,6 +3,7 @@ from .models import Shipment, Transport, Planning, Location, Route
 from dataclasses import dataclass
 from .types import RoutePolylineInput
 from .geo_service import GeoService
+from utils import Timer
 
 
 @dataclass
@@ -43,6 +44,8 @@ class PlanningFactory:
 
 
 class PlanningService:
+    OPEN_ROUTE_SERVICE_USED = False
+
     def get_planning_set(self) -> PlanningSet:
         plannings = Planning.objects.all().prefetch_related("transport", "shipment")
         routes = Route.objects.filter(id__in=plannings.values_list("route"))
@@ -60,10 +63,11 @@ class PlanningService:
         )
 
     def apply_planning(self, planning_request: PlanningRequest):
-        transport = Transport.objects.get(id=planning_request.transport_id)
-        shipment = Shipment.objects.get(id=planning_request.shipment_id)
-        route = self.get_route(transport, shipment)
-        transport.assign_shipment(shipment=shipment, route=route)
+        with Timer(method=self.apply_planning.__qualname__):
+            transport = Transport.objects.get(id=planning_request.transport_id)
+            shipment = Shipment.objects.get(id=planning_request.shipment_id)
+            route = self.get_route(transport, shipment)
+            transport.assign_shipment(shipment=shipment, route=route)
 
     def cancel_planning(self, planning_request: PlanningRequest):
         transport = Transport.objects.get(id=planning_request.transport_id)
@@ -77,5 +81,9 @@ class PlanningService:
             end_lat=shipment.location.latitude,
             end_lon=shipment.location.longitude
         )
-        route_polyline = GeoService().get_route_polyline(route_input=route_input)
+        route_polyline = []
+        if self.OPEN_ROUTE_SERVICE_USED:
+            # TODO Make this an async job
+            route_polyline = GeoService().get_route_polyline(route_input=route_input)
+
         return Route.objects.create(polyline=route_polyline)
