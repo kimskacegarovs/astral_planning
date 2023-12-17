@@ -26,3 +26,20 @@ class LocationSearchResult:
     @classmethod
     def from_json(cls, json_string):
         return cls(**json.loads(json_string))
+
+
+@dataclass
+class RoutePolylineInput:
+    start_lat: float
+    start_lon: float
+    end_lat: float
+    end_lon: float
+
+    @property
+    def as_tuple(self):
+        return self.start_lat, self.start_lon, self.end_lat, self.end_lon
+
+
+@dataclass
+class RoutePolylineOutput:
+    polyline = list[list[float, float]]

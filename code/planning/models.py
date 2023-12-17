@@ -1,4 +1,5 @@
 from django.db import models
+import json
 import random
 import uuid
 
@@ -56,8 +57,8 @@ class Transport(BaseModel):
     plannings = models.ManyToManyField(Shipment, through='Planning')
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
 
-    def assign_shipment(self, shipment: Shipment):
-        Planning.objects.create(shipment=shipment, transport=self)
+    def assign_shipment(self, shipment: Shipment, route: "Route" = None) -> "Planning":
+        return Planning.objects.create(shipment=shipment, transport=self, route=route)
 
     def unassign_shipment(self, shipment: Shipment):
         Planning.objects.filter(shipment=shipment, transport=self).delete()
@@ -67,6 +68,15 @@ class Transport(BaseModel):
         return self.plannings.first()
 
 
+class Route(BaseModel):
+    polyline = models.TextField()
+
+    @property
+    def polyline_array(self):
+        return json.loads(self.polyline)
+
+
 class Planning(BaseModel):
     shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
     transport = models.ForeignKey(Transport, on_delete=models.CASCADE)
+    route = models.ForeignKey(Route, on_delete=models.CASCADE, null=True)

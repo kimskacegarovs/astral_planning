@@ -17,6 +17,8 @@
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""></script>
 
+    <script src="https://unpkg.com/leaflet-ant-path" type="text/javascript"></script>
+
     <style>
         table {
             border-collapse: separate;
@@ -31,7 +33,7 @@
       hx-post="{% url 'apply_planning' %}"
       hx-vals="js: planning_request"
       hx-trigger="click"
-      hx-swap="transition: true; swap: true; settle: true;"
+      hx-swap="transition: true; settle: true;"
       hx-target="#resources">
     {% csrf_token %}
 </form>

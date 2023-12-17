@@ -20,10 +20,15 @@
         {% endfor %}
     ];
     var plannedLines = [
-        {% for item in planning_set.planned_transports %}
+        {% for route in planning_set.routes %}
             [
-                "{{ item.location.coordinates }}",
-                "{{ item.planned_shipment.location.coordinates }}"
+                {% for segment in route.polyline_array %}
+                    [
+                        {% for i in segment %}
+                            {{ i }},
+                        {% endfor %}
+                    ],
+                {% endfor %}
             ],
         {% endfor %}
     ];
@@ -75,18 +80,29 @@
     }
 
     function addMapLines(rawCoordinates) {
-        rawCoordinates.forEach((rawC) => {
-            const coordinatesArray = getConvertedCoordinates(rawC)
+        const defaultColor = '#3388ff';
+        rawCoordinates.forEach(function (coord) {
             const randomColor = getRandomColor();
-            L.polyline(coordinatesArray, {color: randomColor}).addTo(mymap);
-        })
+            const path = L.polyline.antPath(coord, {
+                "delay": 600,
+                "dashArray": [10, 20],
+                "weight": 5,
+                "color": randomColor,
+                "pulseColor": "#FFFFFF",
+                "paused": false,
+                "reverse": false,
+                "hardwareAccelerated": true
+            });
+            mymap.addLayer(path);
+        });
     }
 
     function getRandomColor() {
         const letters = '0123456789ABCDEF';
         let color = '#';
         for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
+            const randomIndex = i === 0 ? Math.floor(Math.random() * 10) : Math.floor(Math.random() * 7);
+            color += letters[randomIndex];
         }
         return color;
     }
