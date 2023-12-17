@@ -66,7 +66,7 @@ class LocationSearchResultSelectView(View):
     def post(self, request, *args, **kwargs):
         location_form_data = json.loads(self.request.POST["data"])
         result = LocationSearchResult.from_json(self.request.POST["result"])
-        initial = {**location_form_data, "location": result.display_name, "coordinates": result.coordinates}
+        initial = {**location_form_data, "address": result.display_name, "coordinates": result.coordinates}
         context = {"location_form": LocationForm(initial=initial), "location_search_form": LocationSearchForm()}
         return render(self.request, "location_form.html", context)
 
@@ -78,7 +78,7 @@ class LocationFormView(FormView):
     def form_valid(self, form):
         name = form.cleaned_data["name"]
         lat, lng = form.cleaned_data["coordinates"].split(",")
-        location = Location.objects.create(latitude=lat, longitude=lng)
+        location = Location.objects.create(latitude=lat, longitude=lng, address=form.cleaned_data["address"])
 
         match EntityType(form.cleaned_data["entity_type"]):
             case EntityType.SHIPMENT:

@@ -13,6 +13,7 @@ class BaseModel(models.Model):
 
 class Location(BaseModel):
     # TODO Consider using GeoDjango https://docs.djangoproject.com/en/4.2/ref/contrib/gis/model-api/
+    address = models.CharField(max_length=300, null=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
 

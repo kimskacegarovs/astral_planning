@@ -57,7 +57,7 @@ def validate_coordinates_input(value):
 class LocationForm(forms.Form):
     entity_type = ChoiceField(placeholder="Type", choices=EntityType.choices())
     name = CharField(placeholder="Name")
-    location = CharField(placeholder="Location")
+    address = CharField(placeholder="Address")
     coordinates = CharField(placeholder="Coordinates", validators=[validate_coordinates_input])
 
 

@@ -1,4 +1,4 @@
-<ul class="border border-gray-500 rounded">
+<ul class="border border-gray-500 rounded" id="location-search-result-container">
     {% for result in search_results %}
         <form id="location-search-result-{{ forloop.counter }}"
               hx-trigger="click"
@@ -25,4 +25,11 @@
         }
         return result;
     }
+
+    document.addEventListener('click', function (event) {
+        const searchResults = document.getElementById('location-search-result-container');
+        if (!searchResults.contains(event.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
 </script>

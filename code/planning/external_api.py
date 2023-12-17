@@ -56,5 +56,5 @@ class OpenRouteService:
     def get_route(self, route_input: RoutePolylineInput) -> RouteResponse:
         directions = self.get_directions(route_input)
         polyline = self.get_polyline_array(directions)
-        distance_km = directions["routes"][0]["summary"]["distance"]
+        distance_km = round(directions["routes"][0]["summary"]["distance"])
         return RouteResponse(polyline=polyline, distance_km=distance_km)

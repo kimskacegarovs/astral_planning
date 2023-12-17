@@ -51,7 +51,7 @@ class PlanningOptimisationService:
                 end_lon=order_location.longitude,
             )
         )
-        distance_km = route.distance_km
+        distance_km = round(route.distance_km)
         print(f"Distance: {distance_km} for {transport} and {shipment}")
         return distance_km
 
@@ -60,7 +60,7 @@ class PlanningOptimisationService:
         order_location = np.array(shipment.location.coordinates)
         diff = transport_location - order_location
         distance = np.linalg.norm(diff)
-        return distance
+        return round(distance)
 
 
 # Change this to switch between the methods

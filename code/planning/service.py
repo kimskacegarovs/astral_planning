@@ -5,6 +5,7 @@ from .types import RoutePolylineInput
 from .geo_service import GeoService
 from utils import Timer
 from .optimisation import PlanningOptimisationService
+from .coordinates import european_capitals
 
 
 @dataclass
@@ -42,6 +43,15 @@ class PlanningFactory:
         Shipment.objects.all().delete()
         Planning.objects.all().delete()
         PlanningFactory().main_factory(k=10)
+
+    def european_capital_factory(self):
+        for i, obj in enumerate(european_capitals):
+            location = Location(latitude=obj["latitude"], longitude=obj["longitude"], address=obj["address"])
+            location.save()
+            if i % 2 == 0:
+                Transport(name=f"Transport {i}", location=location).save()
+            else:
+                Shipment(name=f"Shipment {i}", location=location).save()
 
 
 class PlanningService:
