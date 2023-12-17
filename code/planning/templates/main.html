@@ -55,9 +55,8 @@
 </form>
 
 {% include "location_form.html" %}
-
 {% include "loading_indicator.html" with id="loading-resources" %}
 
-<div hx-get="{% url "resources" %}" hx-indicator="#loading-resources" hx-trigger="load"></div>
+<div hx-get="{% url "resources" %}"  hx-trigger="load"></div>
 </body>
 </html>

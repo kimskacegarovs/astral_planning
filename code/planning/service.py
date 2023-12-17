@@ -55,10 +55,10 @@ class PlanningFactory:
 
 
 class PlanningService:
-    OPEN_ROUTE_SERVICE_USED = True  # TODO Move to settings
-
     def get_planning_set(self) -> PlanningSet:
         plannings = Planning.objects.all().prefetch_related("transport", "shipment")
+        self.assign_routes(plannings=plannings.filter(route__isnull=True))
+
         routes = Route.objects.filter(id__in=plannings.values_list("route"))
         planned_transports = Transport.objects.filter(id__in=plannings.values_list("transport"))
         planned_shipment_ids = planned_transports.values_list("planning__shipment_id", flat=True)
@@ -76,6 +76,12 @@ class PlanningService:
             total_empty_km=total_empty_km,
         )
 
+    def assign_routes(self, plannings: QuerySet[Planning]):
+        for planning in plannings:
+            if existing_route := self.get_route_existing(planning.transport, planning.shipment):
+                planning.route = existing_route
+                planning.save()
+
     def get_planning_polylines(self, planning_set: PlanningSet):
         polylines = []
         for route in planning_set.routes:
@@ -86,8 +92,7 @@ class PlanningService:
         with Timer(method=self.apply_planning.__qualname__):
             transport = Transport.objects.get(id=planning_request.transport_id)
             shipment = Shipment.objects.get(id=planning_request.shipment_id)
-            # route = self.get_route(transport, shipment)
-            route = None
+            route = self.get_route_existing(transport, shipment)
             transport.assign_shipment(shipment=shipment, route=route)
 
     def cancel_planning(self, planning_id: str):
@@ -96,16 +101,29 @@ class PlanningService:
     def reset_planning(self):
         Planning.objects.all().delete()
 
+    def get_route_existing(self, transport: Transport, shipment: Shipment) -> Route | None:
+        existing_routes = Route.objects.filter(location_start=transport.location, location_end=shipment.location)
+        if existing_routes:
+            return existing_routes.first()
+        return None
+
     def get_route(self, transport: Transport, shipment: Shipment) -> Route:
+        if existing_route := self.get_route_existing(transport, shipment):
+            return existing_route
+
         route_input = RoutePolylineInput(
             start_lat=transport.location.latitude,
             start_lon=transport.location.longitude,
             end_lat=shipment.location.latitude,
             end_lon=shipment.location.longitude,
         )
-        if self.OPEN_ROUTE_SERVICE_USED:
-            route = GeoService().get_route(route_input=route_input)
-            return Route.objects.create(polyline=route.polyline, distance_km=route.distance_km)
+        route = GeoService().get_route(route_input=route_input)
+        return Route.objects.create(
+            location_start=transport.location,
+            location_end=shipment.location,
+            polyline=route.polyline,
+            distance_km=route.distance_km,
+        )
 
     def apply_optimal_planning(self):
         planning_set = self.get_planning_set()

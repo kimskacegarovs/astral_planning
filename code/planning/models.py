@@ -1,6 +1,5 @@
 from django.db import models
 import json
-import random
 import uuid
 
 
@@ -11,9 +10,7 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class Location(BaseModel):
-    # TODO Consider using GeoDjango https://docs.djangoproject.com/en/4.2/ref/contrib/gis/model-api/
-    address = models.CharField(max_length=300, null=True)
+class CoordinatesMixin:
     latitude = models.FloatField()
     longitude = models.FloatField()
 
@@ -31,17 +28,12 @@ class Location(BaseModel):
         self.validate_coordinates()
         super().save()
 
-    @classmethod
-    def create_random_location(cls):
-        uzbekistan_latitude_range = (37, 45)  # Latitude range of Uzbekistan
-        uzbekistan_longitude_range = (56, 73)  # Longitude range of Uzbekistan
 
-        instance = cls(
-            latitude=random.uniform(*uzbekistan_latitude_range),
-            longitude=random.uniform(*uzbekistan_longitude_range),
-        )
-        instance.save()
-        return instance
+class Location(CoordinatesMixin, BaseModel):
+    # TODO Consider using GeoDjango https://docs.djangoproject.com/en/4.2/ref/contrib/gis/model-api/
+    address = models.CharField(max_length=300, null=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
 
 
 class Shipment(BaseModel):
@@ -70,6 +62,8 @@ class Transport(BaseModel):
 
 
 class Route(BaseModel):
+    location_start = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="route_start", null=True)
+    location_end = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="route_end", null=True)
     polyline = models.TextField()
     distance_km = models.FloatField(null=True)
 

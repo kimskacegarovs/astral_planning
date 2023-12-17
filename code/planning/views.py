@@ -1,7 +1,7 @@
 from django.shortcuts import render, reverse, redirect, HttpResponse
 from django.views.generic import TemplateView, View, FormView
 from .service import PlanningService, PlanningRequest
-from .models import Transport, Shipment, Location  # TODO Move to service
+from .models import Transport, Shipment, Location
 from .forms import LocationSearchForm, LocationForm, DeleteEntityForm
 from .geo_service import GeoService
 from .types import LocationSearchResult, EntityType
@@ -78,8 +78,7 @@ class LocationFormView(FormView):
     def form_valid(self, form):
         name = form.cleaned_data["name"]
         lat, lng = form.cleaned_data["coordinates"].split(",")
-        location = Location.objects.create(latitude=lat, longitude=lng, address=form.cleaned_data["address"])
-
+        location, _ = Location.objects.get_or_create(latitude=lat, longitude=lng, address=form.cleaned_data["address"])
         match EntityType(form.cleaned_data["entity_type"]):
             case EntityType.SHIPMENT:
                 Shipment.objects.create(location=location, name=name)

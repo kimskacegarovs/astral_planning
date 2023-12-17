@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import linear_sum_assignment
-from .models import Shipment, Transport
+from .models import Shipment, Transport, Route
 from .geo_service import GeoService
 from .types import RoutePolylineInput
 from django.db.models import QuerySet
@@ -8,6 +8,8 @@ import concurrent.futures
 
 
 class PlanningOptimisationService:
+    MAX_EMPTY_KM = 500
+
     def optimal_resource_allocation(self, transports: QuerySet[Transport], shipments: QuerySet[Shipment]):
         num_transports = len(transports)
         num_orders = len(shipments)
@@ -31,13 +33,22 @@ class PlanningOptimisationService:
         # Create a dictionary to store the optimal allocation.
         allocation = {}
         for i, j in zip(row_indices, col_indices):
+            if cost_matrix[i][j] > self.MAX_EMPTY_KM:
+                continue
             allocation[transports[int(i)]] = shipments[int(j)]
 
         return allocation
 
     def calculate_cost(self, transport: Transport, shipment: Shipment):
+        distance_km = self.get_distance(transport, shipment)
+        return distance_km
+
+    def get_distance(self, transport: Transport, shipment: Shipment):
+        existing_routes = Route.objects.filter(location_start=transport.location, location_end=shipment.location)
+        if existing_routes:
+            return existing_routes.first().distance_km
+
         distance_km = CALCULATE_DISTANCE_METHOD(self, transport, shipment)
-        print(f"Distance: {distance_km} for {transport} and {shipment}")
         return distance_km
 
     def calculate_distance_geoservice(self, transport: Transport, shipment: Shipment):
@@ -52,7 +63,6 @@ class PlanningOptimisationService:
             )
         )
         distance_km = round(route.distance_km)
-        print(f"Distance: {distance_km} for {transport} and {shipment}")
         return distance_km
 
     def calculate_distance_euclidian(self, transport: Transport, shipment: Shipment):
