@@ -1,12 +1,12 @@
 <script>
     var coordinatesRawPlannedTransport = [
-        {% for item in planning_set.planned_transports %}
-            "{{ item.location.coordinates }}",
+        {% for item in planning_set.plannings %}
+            "{{ item.transport.location.coordinates }}",
         {% endfor %}
     ];
     var coordinatesRawPlannedShipments = [
-        {% for item in planning_set.planned_transports %}
-            "{{ item.planned_shipment.location.coordinates }}",
+        {% for item in planning_set.plannings %}
+            "{{ item.shipment.location.coordinates }}",
         {% endfor %}
     ];
     var coordinatesRawTransport = [

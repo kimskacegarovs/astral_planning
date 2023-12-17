@@ -36,8 +36,9 @@ class PlanningOptimisationService:
         return allocation
 
     def calculate_cost(self, transport: Transport, shipment: Shipment):
-        distance = self.calculate_distance_geoservice(transport, shipment)  # Or another method
-        return distance
+        distance_km = CALCULATE_DISTANCE_METHOD(self, transport, shipment)
+        print(f"Distance: {distance_km} for {transport} and {shipment}")
+        return distance_km
 
     def calculate_distance_geoservice(self, transport: Transport, shipment: Shipment):
         transport_location = transport.location
@@ -62,4 +63,5 @@ class PlanningOptimisationService:
         return distance
 
 
-CALCULATE_DISTANCE_METHOD = PlanningOptimisationService.calculate_distance_geoservice
+# Change this to switch between the methods
+CALCULATE_DISTANCE_METHOD = PlanningOptimisationService.calculate_distance_euclidian

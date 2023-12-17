@@ -25,9 +25,11 @@ class OpenStreetMapGeocodingService:
 class OpenRouteService:
     API_KEY = "5b3ce3597851110001cf62481cb7eedbdd5649a896773031a3489e53"
     DISTANCE_UNIT = "km"
+    # BASE_URL_LOCAL = "http://localhost:8080/ors"
+    BASE_URL_LOCAL = "https://api.openrouteservice.org/"
 
     def __init__(self):
-        self.client: openrouteservice.Client = openrouteservice.Client(key=self.API_KEY)
+        self.client: openrouteservice.Client = openrouteservice.Client(key=self.API_KEY, base_url=self.BASE_URL_LOCAL)
 
     def get_payload_tuple(self, route_input: RoutePolylineInput) -> tuple:
         start_lat, start_lon, end_lat, end_lon = route_input.as_tuple

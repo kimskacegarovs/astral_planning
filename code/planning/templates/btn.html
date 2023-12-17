@@ -1,3 +1,14 @@
-<button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded {% if margin %}m-{{ margin }}{% endif %} ">
+<button type="submit"
+        class="text-white p-2 rounded
+
+        {% if warning %}
+            bg-red-500 hover:bg-red-600
+        {% else %}
+            bg-blue-500 hover:bg-blue-600
+        {% endif %}
+
+        {% if margin %}m-{{ margin }}{% endif %}
+        "
+>
     {{ text }}
 </button>

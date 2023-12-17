@@ -1,6 +1,6 @@
 <div id="resources" class="container mx-auto mt-8 grid">
     <div>
-        {% include "planned_table.html" with items=planning_set.planned_transports %}
+        {% include "planned_table.html" with items=planning_set.plannings total_empty_km=planning_set.total_empty_km %}
     </div>
 
 
@@ -10,7 +10,15 @@
           hx-swap="outerHTML"
           hx-indicator="#loading-resources">
         {% csrf_token %}
-        {% include "btn.html" with text="Optimise planning" margin=4 %}
+        {% include "btn.html" with text="Optimise planning" margin=2 %}
+    </form>
+
+        <form hx-post="{% url "reset_planning" %}"
+          hx-target="#resources"
+          hx-swap="outerHTML"
+          hx-indicator="#loading-resources">
+        {% csrf_token %}
+        {% include "btn.html" with text="Reset planning" warning="True" margin=2 %}
     </form>
 </div>
 

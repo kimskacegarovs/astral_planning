@@ -39,13 +39,17 @@ class ApplyPlanningView(View):
         return redirect("resources")
 
 
+@view(paths="reset_planning", name="reset_planning")
+class ResetPlanningView(View):
+    def post(self, request, *args, **kwargs):
+        PlanningService().reset_planning()
+        return redirect("resources")
+
+
+@view(paths="cancel_planning", name="cancel_planning")
 class CancelPlanningView(View):
     def post(self, request, *args, **kwargs):
-        planning_request = PlanningRequest(
-            transport_id=self.request.POST["transport_id"],
-            shipment_id=self.request.POST["shipment_id"],
-        )
-        PlanningService().cancel_planning(planning_request=planning_request)
+        PlanningService().cancel_planning(planning_id=self.request.POST["planning_id"])
         return redirect("resources")
 
 
@@ -109,3 +113,11 @@ class ApplyOptimisedPlanningView(View):
         with Timer(method=self.post.__qualname__):
             PlanningService().apply_optimal_planning()
             return redirect("resources")
+
+
+@view(paths="request_route", name="request_route")
+class RequestRouteView(View):
+    def post(self, request, *args, **kwargs):
+        planning_id = self.request.POST["planning_id"]
+        PlanningService().request_route(planning_id=planning_id)
+        return redirect("resources")

@@ -1,4 +1,4 @@
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Sum
 from .models import Shipment, Transport, Planning, Location, Route
 from dataclasses import dataclass
 from .types import RoutePolylineInput
@@ -9,10 +9,11 @@ from .optimisation import PlanningOptimisationService
 
 @dataclass
 class PlanningSet:
+    plannings: QuerySet[Planning]
     routes: QuerySet[Route]
-    planned_transports: QuerySet[Transport]
     unplanned_transports: QuerySet[Transport]
     unplanned_shipments: QuerySet[Shipment]
+    total_empty_km: float
 
 
 @dataclass
@@ -55,11 +56,14 @@ class PlanningService:
         unplanned_transports = Transport.objects.filter(planning__isnull=True)
         unplanned_shipments = Shipment.objects.exclude(id__in=planned_shipment_ids)
 
+        total_empty_km = round(routes.aggregate(total_empty_km=Sum("distance_km"))["total_empty_km"]) if routes else 0
+
         return PlanningSet(
-            planned_transports=planned_transports,
+            plannings=plannings,
             unplanned_transports=unplanned_transports,
             unplanned_shipments=unplanned_shipments,
             routes=routes,
+            total_empty_km=total_empty_km,
         )
 
     def get_planning_polylines(self, planning_set: PlanningSet):
@@ -72,13 +76,15 @@ class PlanningService:
         with Timer(method=self.apply_planning.__qualname__):
             transport = Transport.objects.get(id=planning_request.transport_id)
             shipment = Shipment.objects.get(id=planning_request.shipment_id)
-            route = self.get_route(transport, shipment)
+            # route = self.get_route(transport, shipment)
+            route = None
             transport.assign_shipment(shipment=shipment, route=route)
 
-    def cancel_planning(self, planning_request: PlanningRequest):
-        transport = Transport.objects.get(id=planning_request.transport_id)
-        shipment = Shipment.objects.get(id=planning_request.shipment_id)
-        transport.unassign_shipment(shipment)
+    def cancel_planning(self, planning_id: str):
+        Planning.objects.get(id=planning_id).delete()
+
+    def reset_planning(self):
+        Planning.objects.all().delete()
 
     def get_route(self, transport: Transport, shipment: Shipment) -> Route:
         route_input = RoutePolylineInput(
@@ -99,3 +105,9 @@ class PlanningService:
         )
         for transport, shipment in optimal_planning.items():
             self.apply_planning(PlanningRequest(transport_id=transport.id, shipment_id=shipment.id))
+
+    def request_route(self, planning_id: str):
+        planning = Planning.objects.get(id=planning_id)
+        route = self.get_route(planning.transport, planning.shipment)
+        planning.route = route
+        planning.save()
