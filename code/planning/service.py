@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from .types import RoutePolylineInput
 from .geo_service import GeoService
 from utils import Timer
+from .optimisation import PlanningOptimisationService
 
 
 @dataclass
@@ -44,7 +45,7 @@ class PlanningFactory:
 
 
 class PlanningService:
-    OPEN_ROUTE_SERVICE_USED = False
+    OPEN_ROUTE_SERVICE_USED = True
 
     def get_planning_set(self) -> PlanningSet:
         plannings = Planning.objects.all().prefetch_related("transport", "shipment")
@@ -87,3 +88,13 @@ class PlanningService:
             route_polyline = GeoService().get_route_polyline(route_input=route_input)
 
         return Route.objects.create(polyline=route_polyline)
+
+    def apply_optimal_planning(self):
+        planning_set = self.get_planning_set()
+        optimal_planning = PlanningOptimisationService().optimal_resource_allocation(
+            transports=planning_set.unplanned_transports,
+            shipments=planning_set.unplanned_shipments
+        )
+        for transport, shipment in optimal_planning.items():
+            self.apply_planning(PlanningRequest(transport_id=transport.id, shipment_id=shipment.id))
+

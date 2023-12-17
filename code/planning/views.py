@@ -6,6 +6,7 @@ from .forms import LocationSearchForm, LocationForm, DeleteEntityForm
 from .geo_service import GeoService
 from .types import LocationSearchResult, EntityType
 from django_view_decorator import view
+from .optimisation import PlanningOptimisationService
 import json
 
 
@@ -69,16 +70,21 @@ class LocationFormView(FormView):
     form_class = LocationForm
 
     def form_valid(self, form):
+        name = form.cleaned_data["name"]
         lat, lng = form.cleaned_data["coordinates"].split(",")
         location = Location.objects.create(latitude=lat, longitude=lng)
 
         match EntityType(form.cleaned_data["entity_type"]):
             case EntityType.SHIPMENT:
-                Shipment.objects.create(location=location, name=form.cleaned_data["name"])
+                Shipment.objects.create(location=location, name=name)
             case EntityType.TRANSPORT:
-                Transport.objects.create(location=location, name=form.cleaned_data["name"])
+                Transport.objects.create(location=location, name=name)
 
         return redirect("resources")
+
+    def form_invalid(self, form):
+        # TODO Figure out how to handle invalid form
+        return HttpResponse("Invalid form")
 
 
 @view(paths="delete", name="delete")
@@ -92,4 +98,11 @@ class DeleteEntityView(FormView):
             case EntityType.TRANSPORT:
                 Transport.objects.filter(id=form.cleaned_data["id"]).delete()
 
+        return redirect("resources")
+
+
+@view(paths="apply_optimised_planning", name="apply_optimised_planning")
+class ApplyOptimisedPlanningView(View):
+    def post(self, request, *args, **kwargs):
+        PlanningService().apply_optimal_planning()
         return redirect("resources")

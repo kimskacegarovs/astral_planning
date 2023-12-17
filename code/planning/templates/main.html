@@ -54,6 +54,18 @@
     {% csrf_token %}
 </form>
 {% include "location_form.html" %}
+
+<div class="flex justify-center">
+    <form hx-post="{% url "apply_optimised_planning" %}"
+          hx-target="#resources"
+          hx-swap="outerHTML"
+          hx-indicator="#indicator"
+    >
+        {% csrf_token %}
+        {% include "btn.html" with text="Optimise planning" margin=4 %}
+    </form>
+</div>
+
 <div hx-get="{% url "resources" %}" hx-trigger="load"></div>
 </body>
 </html>
