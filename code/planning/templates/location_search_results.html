@@ -14,3 +14,12 @@
         </form>
     {% endfor %}
 </ul>
+
+<script>
+    document.addEventListener('click', function (event) {
+        const searchResults = document.getElementById('location-search-result-container');
+        if (!searchResults.contains(event.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+</script>

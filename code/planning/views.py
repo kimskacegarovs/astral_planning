@@ -10,7 +10,7 @@ from .forms import CreateEntityForm, DeleteEntityForm, LocationSearchForm, Optim
 from .geo_service import GeoService
 from .models import Location, Shipment, Transport
 from .service import PlanningRequest, PlanningService
-from .types import EntityType, LocationSearchResult
+from .types import EntityType, LocationSearchResult, DataImportParsingOptions
 
 
 class PlanningView(TemplateView):
@@ -164,5 +164,28 @@ class DataImportParseView(View):
 @view(paths="data_import_apply", name="data_import_apply")
 class DataImportApplyView(View):
     def post(self, request, *args, **kwargs):
-        data = self.request.POST
-        print(data)
+        data = json.loads(self.request.POST["data"])
+        dataframe = DataImportService().parse_spreadsheet(data["spreadsheet_content"])
+
+        # TODO Refactor this to use Enums
+        LOCATION = "location"
+        NAME = "name"
+        location_columns = []
+        name_columns = []
+        for key, value in data.items():
+            if not key.endswith("_choice"):
+                continue
+            if value == LOCATION:
+                location_columns.append(key.split("_")[0])
+            elif value == NAME:
+                name_columns.append(key.split("_")[0])
+
+        results = []
+        # iterate over rows, and create location_text and name_text, based on the columns selected
+        for index, row in dataframe.iterrows():
+            name_text = " ".join(str(row[column]) for column in name_columns)
+            location_text = ", ".join(str(row[column]) for column in location_columns)
+            geo_search = GeoService().search(location_text)
+            results.append(DataImportParsingOptions(location=location_text, name=name_text, options=geo_search))
+
+        return render(self.request, "data_import_parsed_items.html", {"results": results})

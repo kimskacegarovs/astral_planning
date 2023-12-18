@@ -1,0 +1,14 @@
+<div class="flex flex-wrap">
+    {% for result in results %}
+    <div class="flex items-center mr-4 mb-4"> <!-- Apply margin as needed -->
+        <div class="mr-2">{{ result.name }} ({{ result.location }}) :</div>
+        <select class="w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-gray-700">
+            {% for option in result.options %}
+                <option value="{{ option.coordinates }}" class="py-1 bg-gray-600">
+                    {{ option.display_name }} ({{ option.coordinates }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endfor %}
+</div>

@@ -49,3 +49,10 @@ class RoutePolylineOutput:
 class RouteResponse:
     polyline: RoutePolylineOutput
     distance_km: float
+
+
+@dataclass
+class DataImportParsingOptions:
+    location: str
+    name: str
+    options: list[LocationSearchResult]

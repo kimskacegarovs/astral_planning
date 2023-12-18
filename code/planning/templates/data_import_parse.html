@@ -23,17 +23,22 @@
     }
 
     /* Lighten the background color of cells on hover */
-    th {
+    .column-type-selector  {
         transition: background-color 0.3s ease; /* Smooth transition effect */
     }
 
-    thead th:hover {
+    .column-type-selector:hover {
         background-color: #595959; /* Lighter background color on hover */
     }
 
 </style>
 
-<form hx-post="{% url "data_import_apply" %}">
+<form hx-post="{% url "data_import_apply" %}"
+      hx-trigger="submit"
+      hx-target="#data_import_parsed_items"
+      hx-indicator="#location_options_indicator"
+      id="data_import_headers_config"
+      hx-vals="js:{data:getMergedFormsData(['data_import_headers_config', 'data_import_form'])}">
     {% csrf_token %}
     <table class="dataframe table m-5">
         <thead>
@@ -42,27 +47,20 @@
                 <th>
                     {{ column }}
                     <div class="radio-buttons flex space-x-2 mt-2">
-                        {% if forloop.first %}
-                            <label class="flex items-center rounded-md border border-blue-500 text-white px-3 py-1">
-                                <input type="radio" name="{{ column }}_choice" id="{{ column }}_name" value="name"
-                                       autocomplete="off" checked> Name
-                            </label>
-                            <label class="flex items-center rounded-md border border-blue-500 px-3 py-1">
-                                <input type="radio" name="{{ column }}_choice" id="{{ column }}_location"
-                                       value="location"
-                                       autocomplete="off"> Location
-                            </label>
-                        {% else %}
-                            <label class="flex items-center rounded-md border border-blue-500 px-3 py-1">
-                                <input type="radio" name="{{ column }}_choice" id="{{ column }}_location"
-                                       value="location"
-                                       autocomplete="off" checked> Location
-                            </label>
-                            <label class="flex items-center rounded-md border border-blue-500 px-3 py-1">
-                                <input type="radio" name="{{ column }}_choice" id="{{ column }}_name" value="name"
-                                       autocomplete="off"> Name
-                            </label>
-                        {% endif %}
+                        <label class="column-type-selector flex items-center rounded-md border border-blue-500 text-white px-3 py-1">
+                            <input type="radio" name="{{ column }}_choice" id="{{ column }}_name" value="name"
+                                   autocomplete="off" {% if forloop.first %}checked{% endif %}> Name
+                        </label>
+                        <label class="column-type-selector flex items-center rounded-md border border-blue-500 px-3 py-1">
+                            <input type="radio" name="{{ column }}_choice" id="{{ column }}_location"
+                                   value="location"
+                                   autocomplete="off" {% if forloop.first == False %}checked{% endif %}> Location
+                        </label>
+                        <label class="column-type-selector flex items-center rounded-md border border-red-500 px-3 py-1">
+                            <input type="radio" name="{{ column }}_choice" id="{{ column }}_ignore"
+                                   value="ignore"
+                                   autocomplete="off"> Ignore
+                        </label>
                     </div>
                 </th>
             {% endfor %}
@@ -80,5 +78,8 @@
     </table>
 
     {% include "btn.html" with text="Submit" %}
+
+{% include "loading_indicator.html" with id="location_options_indicator" %}
+<div id="data_import_parsed_items"></div>
 </form>
 
