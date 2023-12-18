@@ -32,7 +32,7 @@ class ResourcesView(TemplateView):
         apply_optimised_planning = self.request.session.get("apply_optimised_planning", False)
         planning_set = PlanningService().get_planning_set()
 
-        if apply_optimised_planning:
+        if apply_optimised_planning:  # TODO Move to service
             if not planning_set.plannings.filter(route__isnull=True):
                 print("Received all routes. Applying optimal planning.")
                 PlanningService().reset_planning()
@@ -41,7 +41,9 @@ class ResourcesView(TemplateView):
 
         context["planning_set"] = planning_set
         context["planning_polylines"] = PlanningService().get_planning_polylines(planning_set)
-        context["optimise_planning_form"] = OptimisePlanningForm()
+        context["optimise_planning_form"] = OptimisePlanningForm(
+            initial={"max_empty_km": self.request.session.get("max_empty_km")}
+        )
         return context
 
 
@@ -127,8 +129,9 @@ class DeleteEntityView(FormView):
 class ApplyOptimisedPlanningView(View):
     @timer()
     def post(self, request, *args, **kwargs):
-        self.request.session["apply_optimised_planning"] = True
         max_empty_km = int(self.request.POST["max_empty_km"]) if self.request.POST["max_empty_km"] else None
+        self.request.session["max_empty_km"] = max_empty_km
+        self.request.session["apply_optimised_planning"] = True
         PlanningService().apply_optimal_planning(max_empty_km=max_empty_km)
         return redirect("resources")
 

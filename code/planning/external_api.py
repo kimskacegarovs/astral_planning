@@ -1,7 +1,9 @@
 import os
 
+import googlemaps
 import numpy as np
 import openrouteservice
+import polyline
 import requests
 from dotenv import load_dotenv
 from planning.types import LocationSearchResult, RoutePolylineInput, RoutePolylineOutput, RouteResponse
@@ -9,7 +11,7 @@ from planning.types import LocationSearchResult, RoutePolylineInput, RoutePolyli
 load_dotenv()
 
 
-class OpenStreetMapGeocodingService:
+class OpenStreetMapGeocodingClient:
     BASE_URL = "https://nominatim.openstreetmap.org"
 
     def search(self, search: str) -> list[LocationSearchResult]:
@@ -27,7 +29,7 @@ class OpenStreetMapGeocodingService:
         return results
 
 
-class OpenRouteService:
+class OpenRouteServiceClient:
     API_KEY = os.getenv("API_KEY_OPEN_ROUTE_SERVICE")  # TODO Move to settings
     DISTANCE_UNIT = "km"
     # BASE_URL_LOCAL = "http://localhost:8080/ors"
@@ -63,3 +65,25 @@ class OpenRouteService:
         polyline = self.get_polyline_array(directions)
         distance_km = round(directions["routes"][0]["summary"]["distance"])
         return RouteResponse(polyline=polyline, distance_km=distance_km)
+
+
+class GoogleMapsClient:
+    API_KEY = os.getenv("API_KEY_GOOGLE_MAPS")  # TODO Move to settings
+
+    def __init__(self):
+        self.client = googlemaps.Client(key=self.API_KEY)
+
+    def get_route(self, route_input: RoutePolylineInput) -> RouteResponse:
+        directions = self.client.directions(
+            origin=(route_input.start_lat, route_input.start_lon),
+            destination=(route_input.end_lat, route_input.end_lon),
+        )
+
+        polyline_points = directions[0]["overview_polyline"]["points"]
+        route_coordinates = polyline.decode(polyline_points)
+        route_polyline = np.array(route_coordinates).tolist()
+
+        total_distance_meters = directions[0]["legs"][0]["distance"]["value"]
+        total_distance_km = round(total_distance_meters / 1000)
+
+        return RouteResponse(polyline=route_polyline, distance_km=total_distance_km)

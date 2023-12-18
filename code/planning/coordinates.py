@@ -1,3 +1,13 @@
+from dataclasses import dataclass
+
+
+@dataclass
+class CoordinatesLocation:
+    latitude: float
+    longitude: float
+    address: str
+
+
 european_capitals = [
     {"address": "London, United Kingdom", "latitude": 51.5074, "longitude": -0.1278},
     {"address": "Paris, France", "latitude": 48.8566, "longitude": 2.3522},
@@ -10,3 +20,19 @@ european_capitals = [
     {"address": "Amsterdam, Netherlands", "latitude": 52.3676, "longitude": 4.9041},
     {"address": "Oslo, Norway", "latitude": 59.9139, "longitude": 10.7522},
 ]
+
+
+def get_locations(payloads: list[dict]) -> list[CoordinatesLocation]:
+    locations = []
+    for payload in payloads:
+        location = CoordinatesLocation(
+            latitude=payload["latitude"],
+            longitude=payload["longitude"],
+            address=payload["address"],
+        )
+        locations.append(location)
+    return locations
+
+
+def get_locations_european_capitals() -> list[CoordinatesLocation]:
+    return get_locations(european_capitals)

@@ -42,7 +42,7 @@ class RoutePolylineInput:
 
 @dataclass
 class RoutePolylineOutput:
-    polyline = list[list[float, float]]
+    polyline_array = list[list[float, float]]
 
 
 @dataclass
