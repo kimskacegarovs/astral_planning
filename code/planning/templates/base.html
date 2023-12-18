@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Astral solutions{% endblock %}</title>
+    <script src="https://unpkg.com/htmx.org/dist/htmx.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    {% include "tailwind.html" %}
+
+    <style>
+        table {
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        .htmx-indicator {
+            display: none;
+            opacity: 0; /* Initially hidden */
+            transition: opacity 0.3s ease-in-out; /* Smooth transition */
+        }
+
+        .htmx-request .htmx-indicator {
+            opacity: 1; /* Display when making a request */
+        }
+
+        .htmx-request.htmx-indicator {
+            display: inline;
+        }
+    </style>
+
+</head>
+
+<body class="bg-gray-900 text-white">
+{% block content %}
+{% endblock %}
+</body>
+
+</html>

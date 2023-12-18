@@ -11,7 +11,7 @@ class CustomWidgetMixin:
         super().__init__(*args, **kwargs)
 
 
-class TextWidget(CustomWidgetMixin, forms.TextInput):
+class TextWidget(CustomWidgetMixin, forms.Textarea):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -36,4 +36,10 @@ class NumberField(forms.IntegerField):
 class ChoiceField(forms.ChoiceField):
     def __init__(self, *args, **kwargs):
         kwargs["widget"] = SelectWidget(placeholder=kwargs.pop("placeholder", ""))
+        super().__init__(*args, **kwargs)
+
+
+class TextAreaField(forms.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs["widget"] = TextWidget(placeholder=kwargs.pop("placeholder", ""))
         super().__init__(*args, **kwargs)

@@ -13,16 +13,14 @@
 
             <!-- Grid column 1 -->
             <div class="col-span-5">
-                <div class="bg-gray-700 p-2 rounded text-center w-full h-full">
+                <div class="bg-gray-700 p-2 rounded text-center w-full truncate">
                     {{ item.transport.name }} ({{ item.transport.location.address }})
                 </div>
             </div>
             <!-- Grid column 2 -->
             <div class="col-span-5">
-                <div class="flex">
-                    <div class="bg-gray-700 p-2 rounded text-center w-full">
-                        {{ item.shipment.name }} ({{ item.shipment.location.address }})
-                    </div>
+                <div class="bg-gray-700 p-2 rounded text-center w-full truncate">
+                    {{ item.shipment.name }} ({{ item.shipment.location.address }})
                 </div>
             </div>
             <!-- Grid column 3 -->

@@ -5,7 +5,8 @@ from django.views.generic import FormView, TemplateView, View
 from django_view_decorator import view
 from utils import timer
 
-from .forms import CreateEntityForm, DeleteEntityForm, LocationSearchForm, OptimisePlanningForm
+from .data_import import DataImportService
+from .forms import CreateEntityForm, DeleteEntityForm, LocationSearchForm, OptimisePlanningForm, DataImportForm
 from .geo_service import GeoService
 from .models import Location, Shipment, Transport
 from .service import PlanningRequest, PlanningService
@@ -144,3 +145,15 @@ class RequestRouteView(View):
         planning_id = self.request.POST["planning_id"]
         PlanningService().request_route(planning_id=planning_id)
         return redirect("resources")
+
+
+@view(paths="data_import", name="data_import")
+class DataImportView(FormView):
+    template_name = "data_import.html"
+    form_class = DataImportForm
+
+    def form_valid(self, form):
+        spreadsheet_content = form.cleaned_data["spreadsheet_content"]
+        dataframe = DataImportService().parse_spreadsheet(spreadsheet_content)
+        table_class = "table"
+        return HttpResponse(dataframe.to_html(classes=table_class))
