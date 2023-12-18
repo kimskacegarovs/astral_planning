@@ -1,14 +1,20 @@
-<div class="flex flex-wrap">
-    {% for result in results %}
-    <div class="flex items-center mr-4 mb-4"> <!-- Apply margin as needed -->
-        <div class="mr-2">{{ result.name }} ({{ result.location }}) :</div>
-        <select class="w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-gray-700">
-            {% for option in result.options %}
-                <option value="{{ option.coordinates }}" class="py-1 bg-gray-600">
-                    {{ option.display_name }} ({{ option.coordinates }})
-                </option>
-            {% endfor %}
-        </select>
-    </div>
-    {% endfor %}
-</div>
+{% for result in results %}
+    <form hx-post="{% url "data_import_create_entity" %}" hx-target="#create-btn-{{ forloop.counter }}">
+        {% csrf_token %}
+        <div class="grid grid-cols-5 gap-4 my-2"> <!-- Apply margin as needed -->
+            <div class="w-full col-span-2 text-right">{{ result.name }} ({{ result.location }}) :</div>
+            <input hidden name="name" value="{{ result.name }}">
+            <select name="location"
+                    class="w-full col-span-2 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-gray-700">
+                {% for option in result.options %}
+                    <option value="{{ option.coordinates }}; {{ option.display_name }}" class="py-3 bg-gray-600">
+                        {{ option.display_name }} ({{ option.coordinates }})
+                    </option>
+                {% endfor %}
+            </select>
+            <div class="col-span-1" id="create-btn-{{ forloop.counter }}">
+                {% include "btn.html" with text="Create" %}
+            </div>
+        </div>
+    </form>
+{% endfor %}

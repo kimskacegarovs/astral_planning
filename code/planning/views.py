@@ -189,3 +189,16 @@ class DataImportApplyView(View):
             results.append(DataImportParsingOptions(location=location_text, name=name_text, options=geo_search))
 
         return render(self.request, "data_import_parsed_items.html", {"results": results})
+
+
+@view(paths="data_import_create_entity", name="data_import_create_entity")
+class DataImportCreateEntityView(View):
+    def post(self, request, *args, **kwargs):
+        name = self.request.POST["name"]
+        location = self.request.POST["location"]
+        coordinates, address = location.split(";")
+        lat, lng = coordinates.split(",")
+
+        location, _ = Location.objects.get_or_create(latitude=lat, longitude=lng, address=address)
+        Shipment.objects.create(location=location, name=name)
+        return render(self.request, "data_import_entity_saved.html")
