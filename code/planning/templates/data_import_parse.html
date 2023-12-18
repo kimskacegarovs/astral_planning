@@ -1,0 +1,84 @@
+<style>
+    /* Custom CSS for a styled table with rounded corners, column hover effect, and smooth transition */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #ccc;
+    }
+
+    table, th, td {
+        border: 1px solid #ccc;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #3a3a3a;
+        font-weight: bold;
+    }
+
+    /* Lighten the background color of cells on hover */
+    th {
+        transition: background-color 0.3s ease; /* Smooth transition effect */
+    }
+
+    thead th:hover {
+        background-color: #595959; /* Lighter background color on hover */
+    }
+
+</style>
+
+<form hx-post="{% url "data_import_apply" %}">
+    {% csrf_token %}
+    <table class="dataframe table m-5">
+        <thead>
+        <tr style="text-align: right;">
+            {% for column in df.columns %}
+                <th>
+                    {{ column }}
+                    <div class="radio-buttons flex space-x-2 mt-2">
+                        {% if forloop.first %}
+                            <label class="flex items-center rounded-md border border-blue-500 text-white px-3 py-1">
+                                <input type="radio" name="{{ column }}_choice" id="{{ column }}_name" value="name"
+                                       autocomplete="off" checked> Name
+                            </label>
+                            <label class="flex items-center rounded-md border border-blue-500 px-3 py-1">
+                                <input type="radio" name="{{ column }}_choice" id="{{ column }}_location"
+                                       value="location"
+                                       autocomplete="off"> Location
+                            </label>
+                        {% else %}
+                            <label class="flex items-center rounded-md border border-blue-500 px-3 py-1">
+                                <input type="radio" name="{{ column }}_choice" id="{{ column }}_location"
+                                       value="location"
+                                       autocomplete="off" checked> Location
+                            </label>
+                            <label class="flex items-center rounded-md border border-blue-500 px-3 py-1">
+                                <input type="radio" name="{{ column }}_choice" id="{{ column }}_name" value="name"
+                                       autocomplete="off"> Name
+                            </label>
+                        {% endif %}
+                    </div>
+                </th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for index, row in df.iterrows %}
+            <tr>
+                {% for value in row %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% include "btn.html" with text="Submit" %}
+</form>
+

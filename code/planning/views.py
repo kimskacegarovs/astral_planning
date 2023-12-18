@@ -152,8 +152,17 @@ class DataImportView(FormView):
     template_name = "data_import.html"
     form_class = DataImportForm
 
-    def form_valid(self, form):
-        spreadsheet_content = form.cleaned_data["spreadsheet_content"]
+
+@view(paths="data_import_parse", name="data_import_parse")
+class DataImportParseView(View):
+    def post(self, request, *args, **kwargs):
+        spreadsheet_content = self.request.POST["spreadsheet_content"]
         dataframe = DataImportService().parse_spreadsheet(spreadsheet_content)
-        table_class = "table"
-        return HttpResponse(dataframe.to_html(classes=table_class))
+        return render(self.request, "data_import_parse.html", {"df": dataframe})
+
+
+@view(paths="data_import_apply", name="data_import_apply")
+class DataImportApplyView(View):
+    def post(self, request, *args, **kwargs):
+        data = self.request.POST
+        print(data)

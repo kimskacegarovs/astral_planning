@@ -3,52 +3,16 @@
 {% block title %}Astral data paste{% endblock %}
 {% block content %}
 
-    <style>
-        /* Custom CSS for a styled table with rounded corners, column hover effect, and smooth transition */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #ccc;
-        }
-
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #3a3a3a;
-            font-weight: bold;
-        }
-
-        /* Lighten the background color of cells on hover */
-        th {
-            transition: background-color 0.3s ease; /* Smooth transition effect */
-        }
-
-        thead th:not(:first-child):hover {
-            background-color: #595959; /* Lighter background color on hover */
-        }
-
-    </style>
-
     <div class="container m-auto mt-5">
         <h1 class="text-lg">Import data by pasting from spreadsheet</h1>
 
-
-        <form hx-post="{% url "data_import" %}" hx-trigger="submit" hx-target="#data-parsed">
+        <form hx-post="{% url "data_import_parse" %}" hx-trigger="submit" hx-target="#data-parsed">
             {% csrf_token %}
             {% for field in form %}{{ field }}{% endfor %}
             {% include "btn.html" with text="Import" %}
         </form>
 
-        <div id="data-parsed" class="table"></div>
+        <div id="data-parsed"></div>
     </div>
 
 {% endblock %}
