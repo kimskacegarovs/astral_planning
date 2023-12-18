@@ -2,6 +2,10 @@ import requests
 from planning.types import LocationSearchResult, RoutePolylineInput, RoutePolylineOutput, RouteResponse
 import openrouteservice
 import numpy as np
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 
 class OpenStreetMapGeocodingService:
@@ -23,7 +27,7 @@ class OpenStreetMapGeocodingService:
 
 
 class OpenRouteService:
-    API_KEY = "5b3ce3597851110001cf62481cb7eedbdd5649a896773031a3489e53"
+    API_KEY = os.getenv("API_KEY_OPEN_ROUTE_SERVICE")  # TODO Move to settings
     DISTANCE_UNIT = "km"
     # BASE_URL_LOCAL = "http://localhost:8080/ors"
     BASE_URL_LOCAL = "https://api.openrouteservice.org/"
