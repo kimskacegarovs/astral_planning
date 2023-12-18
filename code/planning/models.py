@@ -31,10 +31,15 @@ class CoordinatesMixin:
 
 
 class Location(CoordinatesMixin, BaseModel):
-    # TODO Consider using GeoDjango https://docs.djangoproject.com/en/4.2/ref/contrib/gis/model-api/
     address = models.CharField(max_length=300, null=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
+
+
+class LocationSearchResultData(BaseModel):
+    search_text = models.CharField(max_length=300, null=True)
+    display_name = models.CharField(max_length=300, null=True)
+    coordinates = models.CharField(max_length=300, null=True)
 
 
 class Shipment(BaseModel):

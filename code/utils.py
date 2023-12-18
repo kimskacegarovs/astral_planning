@@ -32,6 +32,7 @@ class Timer:
             print_green(text)
 
 
+# Always declare with () at the end, even if you don't pass any arguments, i.e. @timer()
 def timer(ms_threshold=500):
     def decorator(func):
         @functools.wraps(func)
