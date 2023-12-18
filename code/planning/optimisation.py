@@ -11,7 +11,10 @@ from geopy.distance import geodesic
 class PlanningOptimisationService:
     MAX_EMPTY_KM = 3_000
 
-    def optimal_resource_allocation(self, transports: QuerySet[Transport], shipments: QuerySet[Shipment]):
+    def optimal_resource_allocation(
+        self, transports: QuerySet[Transport], shipments: QuerySet[Shipment], max_empty_km: int = None
+    ):
+        max_empty_km = max_empty_km or self.MAX_EMPTY_KM
         num_transports = len(transports)
         num_orders = len(shipments)
         cost_matrix = np.zeros((num_transports, num_orders))
@@ -34,7 +37,7 @@ class PlanningOptimisationService:
         # Create a dictionary to store the optimal allocation.
         allocation = {}
         for i, j in zip(row_indices, col_indices):
-            if cost_matrix[i][j] > self.MAX_EMPTY_KM:
+            if cost_matrix[i][j] > max_empty_km:
                 continue
             allocation[transports[int(i)]] = shipments[int(j)]
 

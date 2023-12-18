@@ -1,4 +1,5 @@
 import time
+import functools
 
 
 def print_red(text):
@@ -29,3 +30,28 @@ class Timer:
             print_red(text)
         else:
             print_green(text)
+
+
+def timer(ms_threshold=500):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            start_time = time.time()
+            result = func(*args, **kwargs)  # Call the function
+            end_time = time.time()
+
+            elapsed_time = end_time - start_time
+            ms_elapsed = round(elapsed_time * 1000)
+
+            method = f"{func.__qualname__}"
+            text = f"{method} elapsed: {ms_elapsed} ms"
+
+            if ms_elapsed > ms_threshold:
+                print_red(text)  # Print in red color
+            else:
+                print_green(text)  # Print in green color
+            return result
+
+        return wrapper
+
+    return decorator

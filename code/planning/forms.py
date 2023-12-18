@@ -31,6 +31,12 @@ class CharField(forms.CharField):
         super().__init__(*args, **kwargs)
 
 
+class NumberField(forms.IntegerField):
+    def __init__(self, *args, **kwargs):
+        kwargs["widget"] = TextWidget(placeholder=kwargs.pop("placeholder", ""))
+        super().__init__(*args, **kwargs)
+
+
 class ChoiceField(forms.ChoiceField):
     def __init__(self, *args, **kwargs):
         kwargs["widget"] = SelectWidget(placeholder=kwargs.pop("placeholder", ""))
@@ -54,7 +60,7 @@ def validate_coordinates_input(value):
         raise forms.ValidationError(str(e))
 
 
-class LocationForm(forms.Form):
+class CreateEntityForm(forms.Form):
     entity_type = ChoiceField(placeholder="Type", choices=EntityType.choices())
     name = CharField(placeholder="Name")
     address = CharField(placeholder="Address")
@@ -64,3 +70,7 @@ class LocationForm(forms.Form):
 class DeleteEntityForm(forms.Form):
     entity_type = ChoiceField(placeholder="Type", choices=EntityType.choices())
     id = CharField(placeholder="ID")
+
+
+class OptimisePlanningForm(forms.Form):
+    max_empty_km = NumberField(placeholder="Max empty km", required=False)

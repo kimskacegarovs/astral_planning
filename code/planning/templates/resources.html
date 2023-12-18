@@ -10,6 +10,7 @@
           hx-swap="outerHTML"
           hx-indicator="#loading-resources">
         {% csrf_token %}
+        {% for field in optimise_planning_form %}{{ field }}{% endfor %}
         {% include "btn.html" with text="Optimise planning" margin=2 %}
     </form>
 

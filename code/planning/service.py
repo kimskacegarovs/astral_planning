@@ -3,7 +3,7 @@ from .models import Shipment, Transport, Planning, Location, Route
 from dataclasses import dataclass
 from .types import RoutePolylineInput
 from .geo_service import GeoService
-from utils import Timer
+from utils import timer
 from .optimisation import PlanningOptimisationService
 from .coordinates import european_capitals
 
@@ -24,25 +24,10 @@ class PlanningRequest:
 
 
 class PlanningFactory:
-    def transport_factory(self, k: int):
-        for i in range(k):
-            location = Location().create_random_location()
-            Transport(name=f"Transport {i}", location=location).save()
-
-    def shipment_factory(self, k: int):
-        for i in range(k):
-            location = Location().create_random_location()
-            Shipment(name=f"Shipment {i}", location=location).save()
-
-    def main_factory(self, k: int):
-        self.transport_factory(k)
-        self.shipment_factory(k)
-
     def reset_data(self):
         Transport.objects.all().delete()
         Shipment.objects.all().delete()
         Planning.objects.all().delete()
-        PlanningFactory().main_factory(k=10)
 
     def european_capital_factory(self):
         for i, obj in enumerate(european_capitals):
@@ -88,12 +73,12 @@ class PlanningService:
             polylines.append(route.polyline_array)
         return polylines
 
+    @timer()
     def apply_planning(self, planning_request: PlanningRequest):
-        with Timer(method=self.apply_planning.__qualname__):
-            transport = Transport.objects.get(id=planning_request.transport_id)
-            shipment = Shipment.objects.get(id=planning_request.shipment_id)
-            route = self.get_route_existing(transport, shipment)
-            transport.assign_shipment(shipment=shipment, route=route)
+        transport = Transport.objects.get(id=planning_request.transport_id)
+        shipment = Shipment.objects.get(id=planning_request.shipment_id)
+        route = self.get_route_existing(transport, shipment)
+        transport.assign_shipment(shipment=shipment, route=route)
 
     def cancel_planning(self, planning_id: str):
         Planning.objects.get(id=planning_id).delete()
@@ -125,9 +110,11 @@ class PlanningService:
             distance_km=route.distance_km,
         )
 
-    def apply_optimal_planning(self):
+    @timer()
+    def apply_optimal_planning(self, max_empty_km: int = None):
         planning_set = self.get_planning_set()
         optimal_planning = PlanningOptimisationService().optimal_resource_allocation(
+            max_empty_km=max_empty_km,
             transports=planning_set.unplanned_transports,
             shipments=planning_set.unplanned_shipments,
         )
