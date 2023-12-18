@@ -1,4 +1,4 @@
-from .external_api import OpenStreetMapGeocodingService, OpenRouteService
+from .external_api import OpenRouteService, OpenStreetMapGeocodingService
 from .types import LocationSearchResult, RoutePolylineInput, RouteResponse
 
 

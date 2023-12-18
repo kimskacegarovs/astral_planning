@@ -1,5 +1,5 @@
-import time
 import functools
+import time
 
 
 def print_red(text):

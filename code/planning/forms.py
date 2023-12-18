@@ -1,7 +1,8 @@
 from django import forms
-from .types import EntityType
-from forms import CharField, NumberField, ChoiceField
+from forms import CharField, ChoiceField, NumberField
 from validators import validate_coordinates_input
+
+from .types import EntityType
 
 
 class LocationSearchForm(forms.Form):

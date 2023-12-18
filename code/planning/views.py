@@ -1,13 +1,15 @@
-from django.shortcuts import render, reverse, redirect, HttpResponse
-from django.views.generic import TemplateView, View, FormView
-from .service import PlanningService, PlanningRequest
-from .models import Transport, Shipment, Location
-from .forms import LocationSearchForm, CreateEntityForm, DeleteEntityForm, OptimisePlanningForm
-from .geo_service import GeoService
-from .types import LocationSearchResult, EntityType
+import json
+
+from django.shortcuts import HttpResponse, redirect, render, reverse
+from django.views.generic import FormView, TemplateView, View
 from django_view_decorator import view
 from utils import timer
-import json
+
+from .forms import CreateEntityForm, DeleteEntityForm, LocationSearchForm, OptimisePlanningForm
+from .geo_service import GeoService
+from .models import Location, Shipment, Transport
+from .service import PlanningRequest, PlanningService
+from .types import EntityType, LocationSearchResult
 
 
 class PlanningView(TemplateView):

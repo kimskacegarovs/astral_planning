@@ -1,11 +1,13 @@
-from django.db.models import QuerySet, Sum
-from .models import Shipment, Transport, Planning, Location, Route
 from dataclasses import dataclass
-from .types import RoutePolylineInput
-from .geo_service import GeoService
+
+from django.db.models import QuerySet, Sum
 from utils import timer
-from .optimisation import PlanningOptimisationService
+
 from .coordinates import european_capitals
+from .geo_service import GeoService
+from .models import Location, Planning, Route, Shipment, Transport
+from .optimisation import PlanningOptimisationService
+from .types import RoutePolylineInput
 
 
 @dataclass

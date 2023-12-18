@@ -1,11 +1,13 @@
-import numpy as np
-from scipy.optimize import linear_sum_assignment
-from .models import Shipment, Transport, Route
-from .geo_service import GeoService
-from .types import RoutePolylineInput
-from django.db.models import QuerySet
 import concurrent.futures
+
+import numpy as np
+from django.db.models import QuerySet
 from geopy.distance import geodesic
+from scipy.optimize import linear_sum_assignment
+
+from .geo_service import GeoService
+from .models import Route, Shipment, Transport
+from .types import RoutePolylineInput
 
 
 class PlanningOptimisationService:

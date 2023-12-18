@@ -1,5 +1,5 @@
-from django import forms
 from css_classes import CSSClasses
+from django import forms
 
 
 class CustomWidgetMixin:

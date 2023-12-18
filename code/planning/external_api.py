@@ -1,9 +1,10 @@
-import requests
-from planning.types import LocationSearchResult, RoutePolylineInput, RoutePolylineOutput, RouteResponse
-import openrouteservice
-import numpy as np
-from dotenv import load_dotenv
 import os
+
+import numpy as np
+import openrouteservice
+import requests
+from dotenv import load_dotenv
+from planning.types import LocationSearchResult, RoutePolylineInput, RoutePolylineOutput, RouteResponse
 
 load_dotenv()
 
