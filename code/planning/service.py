@@ -114,6 +114,7 @@ class PlanningService:
 
     @timer()
     def apply_optimal_planning(self, max_empty_km: int = None):
+        max_empty_km = int(max_empty_km) if max_empty_km else None
         planning_set = self.get_planning_set()
         optimal_planning = PlanningOptimisationService().optimal_resource_allocation(
             max_empty_km=max_empty_km,

@@ -16,6 +16,7 @@ class PlanningOptimisationService:
     def optimal_resource_allocation(
         self, transports: QuerySet[Transport], shipments: QuerySet[Shipment], max_empty_km: int = None
     ):
+        print(">>>>>>>>>>>", max_empty_km)
         max_empty_km = max_empty_km or self.MAX_EMPTY_KM
         num_transports = len(transports)
         num_orders = len(shipments)
@@ -39,6 +40,7 @@ class PlanningOptimisationService:
         # Create a dictionary to store the optimal allocation.
         allocation = {}
         for i, j in zip(row_indices, col_indices):
+            print(">>>>>>>>>>>", cost_matrix[i][j], max_empty_km)
             if cost_matrix[i][j] > max_empty_km:
                 continue
             allocation[transports[int(i)]] = shipments[int(j)]
