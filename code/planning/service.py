@@ -125,7 +125,9 @@ class PlanningService:
             self.apply_planning(PlanningRequest(transport_id=transport.id, shipment_id=shipment.id))
 
     def request_route(self, planning_id: str):
-        planning = Planning.objects.get(id=planning_id)
+        planning = Planning.objects.filter(id=planning_id).first()
+        if not planning:
+            return None
         route = self.get_route(planning.transport, planning.shipment)
         planning.route = route
         planning.save()

@@ -8,13 +8,18 @@
     <div class="container m-auto mt-5">
         <h1 class="text-lg">Import data by pasting from spreadsheet</h1>
 
-        <form hx-post="{% url "data_import_parse" %}" id="data_import_form" hx-trigger="submit" hx-target="#data-parsed">
+        <form hx-post="{% url "data_import_parse" %}" id="data_import_form" hx-trigger="submit"
+              hx-target="#data-parsed">
             {% csrf_token %}
             {% for field in form %}{{ field }}{% endfor %}
             {% include "btn.html" with text="Import" %}
         </form>
 
         <div id="data-parsed"></div>
+
+        <div onclick="window.close()">
+            {% include "btn.html" with text="Close" margin=4 warning="True" %}
+        </div>
     </div>
 
 {% endblock %}

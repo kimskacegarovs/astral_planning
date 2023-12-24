@@ -11,4 +11,29 @@
         </div>
     </form>
     {% include "location_search.html" %}
+
+    <a href="#" onclick="openWindow();">
+        {% include "btn.html" with text="Import from spreadsheet" margin=2 %}
+    </a>
 </div>
+
+
+<script>
+    function openWindow() {
+        const url = "{% url 'data_import' %}";
+        const sizeMultiplier = 0.8;
+
+        const width = screen.width * sizeMultiplier;
+        const height = screen.height * sizeMultiplier;
+        const left = (screen.width - width) / 2;
+        const top = (screen.height - height) / 2;
+
+        window.open(
+            url, '_blank',
+            'width=' + width
+            + ',height=' + height
+            //  + ',left=' + left
+            // + ',top=' + top
+        );
+    }
+</script>
