@@ -26,4 +26,3 @@ class TestPlanningOptimisationService:
             shipment=Shipment(name="", location=location_new_york),
         )
         assert distance_km == 0
-        # test pr
