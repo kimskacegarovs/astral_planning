@@ -5,3 +5,4 @@ openrouteservice==2.3.3
 pandas==1.5.2
 polyline==2.0.1
 scipy==1.11.4
+django==4.1
