@@ -2,20 +2,16 @@ name: Python application CI
 
 on:
   push:
-    branches: [ main ]  # Execute on pushes to the main branch
+    branches: [ main ]
   pull_request:
-    branches: [ main ]  # Execute on pull requests to the main branch
+    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu environment
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2  # Checkout the repository content to the runner
-
-    - name: Set DJANGO_SETTINGS_MODULE
-      run: |
-        echo "DJANGO_SETTINGS_MODULE=astral_planning.settings" >> $GITHUB_ENV
+    - uses: actions/checkout@v2
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -25,9 +21,15 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt  # Install project dependencies
+        pip install -r requirements.txt
+
+    - name: Set up Django environment
+      run: |
+        export DJANGO_SETTINGS_MODULE=astral_planning.settings
+        python manage.py migrate  # Apply database migrations (if needed)
+        # Add other Django setup commands here
 
     - name: Run tests with pytest
       run: |
         cd code
-        pytest  # Run pytest command
+        pytest
