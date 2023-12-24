@@ -26,6 +26,7 @@ jobs:
     - name: Set up Django environment
       run: |
         export DJANGO_SETTINGS_MODULE=code.astral_planning.settings
+        cd code/astral_planning  # Move to the directory where 'manage.py' exists
         python manage.py migrate  # Apply database migrations (if needed)
         # Add other Django setup commands here
 
