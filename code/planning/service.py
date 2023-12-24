@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from django.db.models import QuerySet, Sum
+from django.db import transaction
 from utils import timer
 
 from .coordinates import european_capitals
@@ -121,8 +122,14 @@ class PlanningService:
             transports=planning_set.unplanned_transports,
             shipments=planning_set.unplanned_shipments,
         )
-        for transport, shipment in optimal_planning.items():
-            self.apply_planning(PlanningRequest(transport_id=transport.id, shipment_id=shipment.id))
+        # Create Planning objects in bulk directly from the optimal_planning dictionary
+        with transaction.atomic():
+            Planning.objects.bulk_create(
+                [
+                    Planning(transport_id=transport.id, shipment_id=shipment.id)
+                    for transport, shipment in optimal_planning.items()
+                ]
+            )
 
     def request_route(self, planning_id: str):
         planning = Planning.objects.filter(id=planning_id).first()
