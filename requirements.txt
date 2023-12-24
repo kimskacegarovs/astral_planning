@@ -1,0 +1,7 @@
+django_view_decorator==0.0.4
+geopy==2.4.1
+googlemaps==4.10.0
+openrouteservice==2.3.3
+pandas==1.5.2
+polyline==2.0.1
+scipy==1.11.4
