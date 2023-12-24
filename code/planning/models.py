@@ -10,6 +10,23 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
+    def get_as_dict(self, json_vals: bool = False) -> dict:
+        fields_dict = {}
+        for field in self._meta.fields:
+            value = getattr(self, field.name)
+            if json_vals:
+                value = str(value)
+            fields_dict[field.name] = value
+        return fields_dict
+
+    @property
+    def as_dict(self) -> dict[str, str]:
+        return self.get_as_dict()
+
+    @property
+    def as_json(self) -> str:
+        return json.dumps(self.get_as_dict(json_vals=True))
+
 
 class CoordinatesMixin:
     latitude = models.FloatField()

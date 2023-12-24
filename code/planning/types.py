@@ -1,5 +1,5 @@
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from enum import Enum
 
 
@@ -25,7 +25,10 @@ class LocationSearchResult:
 
     @classmethod
     def from_json(cls, json_string):
-        return cls(**json.loads(json_string))
+        data = json.loads(json_string)
+        valid_keys = {f.name for f in fields(cls)}  # Get attribute names of the class
+        filtered_data = {key: data[key] for key in valid_keys if key in data}
+        return cls(**filtered_data)
 
 
 @dataclass

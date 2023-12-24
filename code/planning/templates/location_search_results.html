@@ -16,10 +16,12 @@
 </ul>
 
 <script>
-    document.addEventListener('click', function (event) {
+    function hideSearchResultsOnClickOutside(event) {
         const searchResults = document.getElementById('location-search-result-container');
         if (!searchResults.contains(event.target)) {
             searchResults.style.display = 'none';
         }
-    });
+    }
+
+    document.addEventListener('click', () => hideSearchResultsOnClickOutside(event));
 </script>
