@@ -1,4 +1,4 @@
-name: Python application CI
+name: Backend tests
 
 on:
   push:
