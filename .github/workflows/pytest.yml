@@ -25,7 +25,7 @@ jobs:
 
     - name: Set up Django environment
       run: |
-        cd code  # Apply database migrations (if needed)
+        cd code
         python manage.py migrate
 
     - name: Run tests with pytest
