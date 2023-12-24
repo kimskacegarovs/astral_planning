@@ -65,3 +65,4 @@ class TestPlanningOptimisationService:
 
         # Then distance from Route is returned
         assert distance_km == route_distance_km
+
