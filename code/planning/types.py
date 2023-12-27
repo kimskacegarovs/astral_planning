@@ -1,6 +1,34 @@
 import json
 from dataclasses import dataclass, fields
+from typing import Any
 from enum import Enum
+
+
+@dataclass
+class DataclassJSONMixin:
+    def get_as_dict(self, json_vals=False) -> dict[str, Any]:
+        fields_dict = {}
+        for field in fields(self):
+            value = getattr(self, field.name)
+            if json_vals:
+                value = str(value)
+            fields_dict[field.name] = value
+        return fields_dict
+
+    @property
+    def as_dict(self) -> dict[str, Any]:
+        return self.get_as_dict()
+
+    @property
+    def as_json(self) -> str:
+        return json.dumps(self.get_as_dict(json_vals=True))
+
+    @classmethod
+    def from_json(cls, json_string: str):
+        data = json.loads(json_string)
+        valid_keys = {f.name for f in fields(cls)}  # Get attribute names of the class
+        filtered_data = {key: data[key] for key in valid_keys if key in data}
+        return cls(**filtered_data)
 
 
 class DjangoChoicesEnum(Enum):
@@ -15,20 +43,9 @@ class EntityType(DjangoChoicesEnum):
 
 
 @dataclass
-class LocationSearchResult:
+class LocationSearchResult(DataclassJSONMixin):
     display_name: str
     coordinates: str
-
-    @property
-    def as_json(self):
-        return json.dumps(self.__dict__)
-
-    @classmethod
-    def from_json(cls, json_string):
-        data = json.loads(json_string)
-        valid_keys = {f.name for f in fields(cls)}  # Get attribute names of the class
-        filtered_data = {key: data[key] for key in valid_keys if key in data}
-        return cls(**filtered_data)
 
 
 @dataclass
@@ -45,7 +62,7 @@ class RoutePolylineInput:
 
 @dataclass
 class RoutePolylineOutput:
-    polyline_array = list[list[float, float]]
+    polyline_array: list[list[float, float]]
 
 
 @dataclass
