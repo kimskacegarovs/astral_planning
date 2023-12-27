@@ -28,7 +28,19 @@ jobs:
         cd code
         python manage.py migrate
 
-    - name: Run tests with pytest
+    - name: Run tests with coverage
       run: |
         cd code
-        pytest
+        pytest --cov
+
+    - name: Check coverage threshold
+      run: |
+        cd code
+        coverage=$(pytest --cov --cov-report=xml | grep -oP 'total="(.*?)"' | grep -oP '".*?"' | tr -d '"')
+        threshold=75  # Set your desired coverage threshold here
+        if [ "$coverage" -lt "$threshold" ]; then
+          echo "Coverage is below threshold $threshold% ($coverage%)."
+          exit 1
+        else
+          echo "Coverage is acceptable ($coverage%)."
+        fi
