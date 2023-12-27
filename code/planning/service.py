@@ -4,9 +4,8 @@ from django.db.models import QuerySet, Sum
 from django.db import transaction
 from utils import timer
 
-from .coordinates import european_capitals
 from .geo_service import GeoService
-from .models import Location, Planning, Route, Shipment, Transport
+from .models import Planning, Route, Shipment, Transport
 from .optimisation import PlanningOptimisationService
 from .types import RoutePolylineInput
 
@@ -24,22 +23,6 @@ class PlanningSet:
 class PlanningRequest:
     transport_id: str
     shipment_id: str
-
-
-class PlanningFactory:
-    def reset_data(self):
-        Transport.objects.all().delete()
-        Shipment.objects.all().delete()
-        Planning.objects.all().delete()
-
-    def european_capital_factory(self):
-        for i, obj in enumerate(european_capitals):
-            location = Location(latitude=obj["latitude"], longitude=obj["longitude"], address=obj["address"])
-            location.save()
-            if i % 2 == 0:
-                Transport(name=f"Transport {i}", location=location).save()
-            else:
-                Shipment(name=f"Shipment {i}", location=location).save()
 
 
 class PlanningService:
@@ -80,7 +63,7 @@ class PlanningService:
     def apply_planning(self, planning_request: PlanningRequest):
         transport = Transport.objects.get(id=planning_request.transport_id)
         shipment = Shipment.objects.get(id=planning_request.shipment_id)
-        route = self.get_route_existing(transport, shipment)
+        route = self.get_route(transport, shipment)
         transport.assign_shipment(shipment=shipment, route=route)
 
     def cancel_planning(self, planning_id: str):

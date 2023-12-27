@@ -1,31 +1,14 @@
 import json
 import pytest
-from .models import Location, Shipment, Transport, Route, Planning, LocationSearchResultData
-
-
-@pytest.fixture
-def transport():
-    return Transport.objects.create(name="Test Transport")
-
-
-@pytest.fixture
-def shipment():
-    return Shipment.objects.create(name="Test Shipment")
-
-
-@pytest.fixture
-def route():
-    return Route.objects.create(polyline=json.dumps([[1.0, 2.0], [3.0, 4.0]]))
+from .models import Location, Route, Planning, LocationSearchResultData
 
 
 @pytest.mark.django_db
 class TestCoordinatesMixin:
-    def test_coordinates(self):
-        location = Location(latitude=50.0, longitude=30.0)
+    def test_coordinates(self, location):
         assert location.coordinates == (50.0, 30.0)
 
-    def test_valid_coordinates(self):
-        location = Location(latitude=50.0, longitude=30.0)
+    def test_valid_coordinates(self, location):
         location.validate_coordinates()  # Should not raise any errors
 
     def test_invalid_latitude(self):
