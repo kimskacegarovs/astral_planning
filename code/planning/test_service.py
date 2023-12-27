@@ -1,6 +1,7 @@
 import pytest
 from .service import PlanningService
-from .models import Planning, Route
+from .models import Planning, Route, Transport, Shipment
+from .types import EntityType
 
 
 @pytest.mark.django_db
@@ -27,3 +28,10 @@ class TestPlanningService:
         assert plannings.count() == 1
         assert plannings.first().transport == transport
         assert plannings.first().shipment == shipment
+
+    def test_create_entity(self, location):
+        created = PlanningService().create_entity(entity_type=EntityType.TRANSPORT, name="", location=location)
+        assert isinstance(created, Transport)
+
+        created = PlanningService().create_entity(entity_type=EntityType.SHIPMENT, name="", location=location)
+        assert isinstance(created, Shipment)

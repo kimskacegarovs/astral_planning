@@ -13,6 +13,7 @@ from .service import PlanningRequest, PlanningService
 from .types import EntityType, LocationSearchResult, DataImportParsingOptions
 
 
+@view(paths="planning/", name="planning/")
 class PlanningView(TemplateView):
     template_name = "main.html"
 
@@ -101,12 +102,8 @@ class CreateEntityView(FormView):
         name = form.cleaned_data["name"]
         lat, lng = form.cleaned_data["coordinates"].split(",")
         location, _ = Location.objects.get_or_create(latitude=lat, longitude=lng, address=form.cleaned_data["address"])
-        match EntityType(form.cleaned_data["entity_type"]):
-            case EntityType.SHIPMENT:
-                Shipment.objects.create(location=location, name=name)
-            case EntityType.TRANSPORT:
-                Transport.objects.create(location=location, name=name)
-
+        entity_type = EntityType(form.cleaned_data["entity_type"])
+        PlanningService().create_entity(name=name, location=location, entity_type=entity_type)
         return redirect("resources")
 
     def form_invalid(self, form):
