@@ -1,6 +1,26 @@
 import json
 import pytest
-from .models import Location, Route, Planning, LocationSearchResultData
+from .models import Location, Route, Transport, Shipment, Planning, LocationSearchResultData
+
+
+@pytest.fixture
+def transport():
+    return Transport.objects.create(name="Test Transport")
+
+
+@pytest.fixture
+def shipment():
+    return Shipment.objects.create(name="Test Shipment")
+
+
+@pytest.fixture
+def route():
+    return Route.objects.create(polyline=json.dumps([[1.0, 2.0], [3.0, 4.0]]))
+
+
+@pytest.fixture
+def location():
+    return Location.objects.create(latitude=50.0, longitude=30.0)
 
 
 @pytest.mark.django_db

@@ -1,6 +1,16 @@
 import pytest
 from .service import PlanningService
-from .models import Planning
+from .models import Transport, Shipment, Planning
+
+
+@pytest.fixture
+def transport():
+    return Transport.objects.create(name="Test Transport")
+
+
+@pytest.fixture
+def shipment():
+    return Shipment.objects.create(name="Test Shipment")
 
 
 @pytest.mark.django_db
