@@ -36,7 +36,8 @@ jobs:
     - name: Check coverage threshold
       run: |
         cd code
-        coverage=$(pytest --cov --cov-report=xml | grep -oP 'total="(.*?)"' | grep -oP '".*?"' | tr -d '"')
+        pytest --cov --cov-report=xml
+        coverage=$(grep -oP 'line-rate=".*?"' coverage.xml | grep -oP '".*?"' | tr -d '"' | awk '{print $1 * 100}')
         threshold=75  # Set your desired coverage threshold here
         if [ "$coverage" -lt "$threshold" ]; then
           echo "Coverage is below threshold $threshold% ($coverage%)."
