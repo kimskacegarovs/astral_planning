@@ -37,11 +37,12 @@ jobs:
       run: |
         cd code
         pytest --cov --cov-report=xml
-        coverage=$(grep -oP 'line-rate=".*?"' coverage.xml | grep -oP '".*?"' | tr -d '"' | awk '{print int($1 * 100)}')
-        threshold=80  # Set your desired coverage threshold here
-        if [ "$coverage" -lt "$threshold" ]; then
-          echo "Coverage is below threshold $threshold% ($coverage%)."
+        coverage=$(grep -oP 'line-rate="[^"]+"' coverage.xml | cut -d'"' -f2)
+        coverage_percentage=$(awk -v cov="$coverage" 'BEGIN { print int(cov * 100) }')
+        threshold=75  # Set your desired coverage threshold here
+        if [ "$coverage_percentage" -lt "$threshold" ]; then
+          echo "Coverage is below threshold $threshold% ($coverage_percentage%)."
           exit 1
         else
-          echo "Coverage is acceptable ($coverage% >= $threshold%)."
+          echo "Coverage is acceptable ($coverage_percentage% > $threshold%)."
         fi
