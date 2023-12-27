@@ -1,4 +1,4 @@
-from django import forms
+from django.forms import ValidationError
 
 
 def validate_coordinates_input(value):
@@ -11,4 +11,4 @@ def validate_coordinates_input(value):
         if longitude < -180 or longitude > 180:
             raise ValueError("Longitude must be in range [-180, 180]")
     except ValueError as e:
-        raise forms.ValidationError(str(e))
+        raise ValidationError(str(e))

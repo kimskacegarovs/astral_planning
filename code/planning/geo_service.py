@@ -1,5 +1,4 @@
 from .external_api import OpenStreetMapGeocodingClient, GoogleMapsClient
-from django.db.models import QuerySet
 from .types import RoutePolylineInput, RouteResponse
 from .models import LocationSearchResultData
 from utils import timer
@@ -7,10 +6,10 @@ from utils import timer
 
 class GeoService:
     @timer()
-    def search(self, search: str) -> QuerySet[LocationSearchResultData]:
+    def search(self, search: str) -> list[LocationSearchResultData]:
         if existing_results := LocationSearchResultData.objects.filter(search_text=search):
             print(f"Found {len(existing_results)} existing results for search '{search}'")
-            return existing_results
+            return list(existing_results)
 
         new_results = LocationSearchResultData.objects.bulk_create(
             [

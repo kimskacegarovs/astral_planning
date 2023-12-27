@@ -28,7 +28,21 @@ jobs:
         cd code
         python manage.py migrate
 
-    - name: Run tests with pytest
+    - name: Run tests with coverage
       run: |
         cd code
-        pytest
+        pytest --cov
+
+    - name: Check coverage threshold
+      run: |
+        cd code
+        pytest --cov --cov-report=xml
+        coverage=$(grep -oP 'line-rate="[^"]+"' coverage.xml | cut -d'"' -f2)
+        coverage_percentage=$(awk -v cov="$coverage" 'BEGIN { print int(cov * 100) }')
+        threshold=75  # Set your desired coverage threshold here
+        if [ "$coverage_percentage" -lt "$threshold" ]; then
+          echo "Coverage is below threshold $threshold% ($coverage_percentage%)."
+          exit 1
+        else
+          echo "Coverage is acceptable ($coverage_percentage% > $threshold%)."
+        fi
