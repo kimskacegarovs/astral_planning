@@ -1,5 +1,7 @@
 import functools
 import time
+from django_view_decorator.apps import ViewRegistry
+from django.test import RequestFactory
 
 
 def print_red(text):
@@ -56,3 +58,17 @@ def timer(ms_threshold=500):
         return wrapper
 
     return decorator
+
+
+def get_view_path(view):
+    for key, value in ViewRegistry.views.items():
+        for k2, v2 in value.items():
+            if view == v2[0].view:
+                return k2
+
+
+def make_request_get(view):
+    factory = RequestFactory()
+    url = get_view_path(view)
+    request = factory.get(url)
+    return view(request)

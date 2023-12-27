@@ -5,9 +5,9 @@ from django.db import transaction
 from utils import timer
 
 from .geo_service import GeoService
-from .models import Planning, Route, Shipment, Transport
+from .models import Planning, Route, Shipment, Transport, Location
 from .optimisation import PlanningOptimisationService
-from .types import RoutePolylineInput
+from .types import RoutePolylineInput, EntityType
 
 
 @dataclass
@@ -70,6 +70,7 @@ class PlanningService:
         Planning.objects.get(id=planning_id).delete()
 
     def reset_planning(self):
+        # TODO This should be filtered by identifier (user or session)
         Planning.objects.all().delete()
 
     def get_route_existing(self, transport: Transport, shipment: Shipment) -> Route | None:
@@ -121,3 +122,10 @@ class PlanningService:
         route = self.get_route(planning.transport, planning.shipment)
         planning.route = route
         planning.save()
+
+    def create_entity(self, entity_type: EntityType, name: str, location: Location) -> Shipment | Transport:
+        match entity_type:
+            case EntityType.SHIPMENT:
+                return Shipment.objects.create(location=location, name=name)
+            case EntityType.TRANSPORT:
+                return Transport.objects.create(location=location, name=name)
