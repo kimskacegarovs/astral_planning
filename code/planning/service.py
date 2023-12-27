@@ -70,6 +70,7 @@ class PlanningService:
         Planning.objects.get(id=planning_id).delete()
 
     def reset_planning(self):
+        # TODO This should be filtered by identifier (user or session)
         Planning.objects.all().delete()
 
     def get_route_existing(self, transport: Transport, shipment: Shipment) -> Route | None:
