@@ -58,7 +58,7 @@ class OpenRouteServiceClient:
         polyline_coords[:, [0, 1]] = polyline_coords[:, [1, 0]]
         polyline_coords = polyline_coords.tolist()
 
-        return polyline_coords
+        return RoutePolylineOutput(polyline_array=polyline_coords)
 
     def get_route(self, route_input: RoutePolylineInput) -> RouteResponse:
         directions = self.get_directions(route_input)

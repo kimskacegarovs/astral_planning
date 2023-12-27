@@ -3,7 +3,7 @@ from io import StringIO
 
 
 class DataImportService:
-    def parse_spreadsheet(self, spreadsheet_content):
+    def parse_spreadsheet(self, spreadsheet_content: str) -> pd.DataFrame:
         file_data = StringIO(spreadsheet_content)
         df = pd.read_csv(file_data, sep="\t")
         df = df.fillna("")
