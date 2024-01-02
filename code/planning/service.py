@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from django.db.models import QuerySet, Sum
 from django.db import transaction
 from utils import timer
@@ -7,28 +5,13 @@ from utils import timer
 from .geo_service import GeoService
 from .models import Planning, Route, Shipment, Transport, Location
 from .optimisation import PlanningOptimisationService
-from .types import RoutePolylineInput, EntityType
-
-
-@dataclass
-class PlanningSet:
-    plannings: QuerySet[Planning]
-    routes: QuerySet[Route]
-    unplanned_transports: QuerySet[Transport]
-    unplanned_shipments: QuerySet[Shipment]
-    total_empty_km: float
-
-
-@dataclass
-class PlanningRequest:
-    transport_id: str
-    shipment_id: str
+from .types import RoutePolylineInput, EntityType, PlanningSet, PlanningRequest
 
 
 class PlanningService:
     def get_planning_set(self) -> PlanningSet:
         plannings = Planning.objects.all().prefetch_related("transport", "shipment")
-        self.assign_routes(plannings=plannings.filter(route__isnull=True))
+        self.assign_existing_routes(plannings=plannings.filter(route__isnull=True))
 
         routes = Route.objects.filter(id__in=plannings.values_list("route"))
         planned_transports = Transport.objects.filter(id__in=plannings.values_list("transport"))
@@ -47,17 +30,14 @@ class PlanningService:
             total_empty_km=total_empty_km,
         )
 
-    def assign_routes(self, plannings: QuerySet[Planning]):
+    def assign_existing_routes(self, plannings: QuerySet[Planning]) -> None:
         for planning in plannings:
             if existing_route := self.get_route_existing(planning.transport, planning.shipment):
                 planning.route = existing_route
                 planning.save()
 
-    def get_planning_polylines(self, planning_set: PlanningSet):
-        polylines = []
-        for route in planning_set.routes:
-            polylines.append(route.polyline_array)
-        return polylines
+    def get_planning_polylines(self, planning_set: PlanningSet) -> list[list[list[float]]]:
+        return [route.polyline_array for route in planning_set.routes]
 
     @timer()
     def apply_planning(self, planning_request: PlanningRequest):
@@ -106,21 +86,16 @@ class PlanningService:
             transports=planning_set.unplanned_transports,
             shipments=planning_set.unplanned_shipments,
         )
-        # Create Planning objects in bulk directly from the optimal_planning dictionary
+        plannings = []
+        for transport, shipment in optimal_planning.items():
+            plannings.append(Planning(transport=transport, shipment=shipment))
         with transaction.atomic():
-            Planning.objects.bulk_create(
-                [
-                    Planning(transport_id=transport.id, shipment_id=shipment.id)
-                    for transport, shipment in optimal_planning.items()
-                ]
-            )
+            Planning.objects.bulk_create(plannings)
 
     def request_route(self, planning_id: str):
-        planning = Planning.objects.filter(id=planning_id).first()
-        if not planning:
-            return None
-        route = self.get_route(planning.transport, planning.shipment)
-        planning.route = route
+        if (planning := Planning.objects.filter(id=planning_id).first()) is None:
+            return planning  # Handle concurrent planning resets
+        planning.route = self.get_route(planning.transport, planning.shipment)
         planning.save()
 
     def create_entity(self, entity_type: EntityType, name: str, location: Location) -> Shipment | Transport:

@@ -6,22 +6,20 @@ from geopy.distance import geodesic
 from scipy.optimize import linear_sum_assignment
 
 from .models import Route, Shipment, Transport
-from utils import timer
-import os
+from utils import timer, is_pytest
 
 
 class PlanningOptimisationService:
-    MAX_EMPTY_KM = 3_000
+    DEFAULT_MAX_EMPTY_KM = 3_000
 
     def __init__(self, concurrency: bool = True):
-        is_pytest = "PYTEST_CURRENT_TEST" in os.environ
-        self.CONCURRENT = concurrency if not is_pytest else False
+        self.CONCURRENT = concurrency if not is_pytest() else False
 
     @timer()
     def optimal_resource_allocation(
         self, transports: QuerySet[Transport], shipments: QuerySet[Shipment], max_empty_km: int = None
     ) -> dict[Transport, Shipment]:
-        max_empty_km = max_empty_km or self.MAX_EMPTY_KM
+        max_empty_km = max_empty_km or self.DEFAULT_MAX_EMPTY_KM
         cost_matrix = self.get_cost_matrix(transports=transports, shipments=shipments)
         row_indices, col_indices = self.get_linear_sum_assignment(cost_matrix)
 

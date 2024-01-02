@@ -20,7 +20,7 @@ def shipment(location):
 
 @pytest.fixture
 def route():
-    return Route.objects.create(polyline=json.dumps([[1.0, 2.0], [3.0, 4.0]]))
+    return Route.objects.create(polyline=json.dumps([[1.0, 2.0], [3.0, 4.0]]), distance_km=10.0)
 
 
 @pytest.fixture

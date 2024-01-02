@@ -79,6 +79,7 @@ class Transport(BaseModel):
     def unassign_shipment(self, shipment: Shipment):
         Planning.objects.filter(shipment=shipment, transport=self).delete()
 
+    @property
     def planned_shipment(self):
         # When there will be many planning, we should filter by identifier (user or session)
         return self.plannings.first()
