@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch
 from .service import PlanningService
 from .models import Planning, Route, Transport, Shipment
 from .types import EntityType
@@ -35,3 +36,11 @@ class TestPlanningService:
 
         created = PlanningService().create_entity(entity_type=EntityType.SHIPMENT, name="", location=location)
         assert isinstance(created, Shipment)
+
+    def test_request_route(self, planning, route):
+        assert planning.route is None
+
+        with patch("planning.service.PlanningService.get_route", return_value=route):
+            PlanningService().request_route(planning_id=planning.id)
+            planning.refresh_from_db()
+            assert planning.route == route

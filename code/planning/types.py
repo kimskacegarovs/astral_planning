@@ -2,6 +2,23 @@ import json
 from dataclasses import dataclass, fields
 from typing import Any
 from enum import Enum
+from django.db.models import QuerySet
+from .models import Planning, Route, Shipment, Transport
+
+
+@dataclass
+class PlanningSet:
+    plannings: QuerySet[Planning]
+    routes: QuerySet[Route]
+    unplanned_transports: QuerySet[Transport]
+    unplanned_shipments: QuerySet[Shipment]
+    total_empty_km: float
+
+
+@dataclass
+class PlanningRequest:
+    transport_id: str
+    shipment_id: str
 
 
 @dataclass

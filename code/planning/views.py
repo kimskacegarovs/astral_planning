@@ -9,8 +9,8 @@ from .data_import import DataImportService
 from .forms import CreateEntityForm, DeleteEntityForm, LocationSearchForm, OptimisePlanningForm, DataImportForm
 from .geo_service import GeoService
 from .models import Location, Shipment, Transport
-from .service import PlanningRequest, PlanningService
-from .types import EntityType, LocationSearchResult, DataImportParsingOptions
+from .service import PlanningService
+from .types import EntityType, LocationSearchResult, DataImportParsingOptions, PlanningRequest
 
 
 @view(paths="planning/", name="planning/")
