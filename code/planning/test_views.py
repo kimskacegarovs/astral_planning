@@ -1,5 +1,7 @@
 import pytest
-from .views import PlanningView, ApplyPlanningView
+from unittest.mock import patch
+from .models import Planning
+from .views import PlanningView, ApplyPlanningView, ResetPlanningView
 from .forms import CreateEntityForm, LocationSearchForm
 from .types import PlanningRequest
 from utils import make_request_get, make_request_post
@@ -23,8 +25,18 @@ class TestPlanningView:
 
 @pytest.mark.django_db
 class TestApplyPlanningView:
-    def test_post(self, shipment, transport):
+    def test_post(self, shipment, transport, route):
         planning_request = PlanningRequest(shipment_id=shipment.id, transport_id=transport.id)
         data = {"planning_request": planning_request.as_json}
-        response = make_request_post(view=ApplyPlanningView, data=data)
+        with patch("planning.service.PlanningService.get_route", return_value=route):
+            response = make_request_post(view=ApplyPlanningView, data=data)
         assert response.status_code == 302
+        assert transport.planned_shipment is not None
+
+
+@pytest.mark.django_db
+class TestResetPlanningView:
+    def test_post(self, planning):
+        response = make_request_post(view=ResetPlanningView, data={})
+        assert response.status_code == 302
+        assert Planning.objects.all().exists() is False

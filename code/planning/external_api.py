@@ -6,6 +6,7 @@ import polyline
 import requests
 from dotenv import load_dotenv
 from planning.types import LocationSearchResult, RoutePolylineInput, RouteResponse
+from utils import is_pytest
 
 load_dotenv()
 
@@ -26,10 +27,9 @@ class OpenStreetMapGeocodingClient:
 
 
 class GoogleMapsClient:
-    API_KEY = os.getenv("API_KEY_GOOGLE_MAPS")  # TODO Move to settings
-
     def __init__(self):
-        self.client = googlemaps.Client(key=self.API_KEY)
+        api_key = os.getenv("API_KEY_GOOGLE_MAPS") if not is_pytest() else None  # TODO Make this logic more generic
+        self.client = googlemaps.Client(key=api_key)
 
     def get_route(self, route_input: RoutePolylineInput) -> RouteResponse:
         directions = self.client.directions(

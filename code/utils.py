@@ -2,6 +2,7 @@ import functools
 import time
 from django_view_decorator.apps import ViewRegistry
 from django.test import RequestFactory
+import os
 
 
 def print_red(text):
@@ -55,3 +56,8 @@ def make_request_post(view, data: dict):
     url = get_view_path(view)
     request = RequestFactory().post(url, data=data)
     return view(request)
+
+
+def is_pytest() -> bool:
+    result = "PYTEST_CURRENT_TEST" in os.environ
+    return result
