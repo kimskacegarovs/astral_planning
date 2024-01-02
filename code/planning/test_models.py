@@ -55,8 +55,7 @@ class TestTransport:
 
     def test_planned_shipment(self, transport, shipment):
         transport.assign_shipment(shipment)
-        planned_shipment = transport.planned_shipment()
-        assert planned_shipment == shipment
+        assert transport.planned_shipment == shipment
 
 
 @pytest.mark.django_db

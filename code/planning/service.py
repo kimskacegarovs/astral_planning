@@ -11,7 +11,7 @@ from .types import RoutePolylineInput, EntityType, PlanningSet, PlanningRequest
 class PlanningService:
     def get_planning_set(self) -> PlanningSet:
         plannings = Planning.objects.all().prefetch_related("transport", "shipment")
-        self.assign_routes(plannings=plannings.filter(route__isnull=True))
+        self.assign_existing_routes(plannings=plannings.filter(route__isnull=True))
 
         routes = Route.objects.filter(id__in=plannings.values_list("route"))
         planned_transports = Transport.objects.filter(id__in=plannings.values_list("transport"))
@@ -30,17 +30,14 @@ class PlanningService:
             total_empty_km=total_empty_km,
         )
 
-    def assign_routes(self, plannings: QuerySet[Planning]):
+    def assign_existing_routes(self, plannings: QuerySet[Planning]) -> None:
         for planning in plannings:
             if existing_route := self.get_route_existing(planning.transport, planning.shipment):
                 planning.route = existing_route
                 planning.save()
 
-    def get_planning_polylines(self, planning_set: PlanningSet):
-        polylines = []
-        for route in planning_set.routes:
-            polylines.append(route.polyline_array)
-        return polylines
+    def get_planning_polylines(self, planning_set: PlanningSet) -> list[list[list[float]]]:
+        return [route.polyline_array for route in planning_set.routes]
 
     @timer()
     def apply_planning(self, planning_request: PlanningRequest):
