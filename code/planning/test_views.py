@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 from .models import Planning
-from .views import PlanningView, ApplyPlanningView, ResetPlanningView
+from .views import PlanningView, ApplyPlanningView, ResetPlanningView, CancelPlanningView
 from .forms import CreateEntityForm, LocationSearchForm
 from .types import PlanningRequest
 from utils import make_request_get, make_request_post
@@ -38,5 +38,13 @@ class TestApplyPlanningView:
 class TestResetPlanningView:
     def test_post(self, planning):
         response = make_request_post(view=ResetPlanningView, data={})
+        assert response.status_code == 302
+        assert Planning.objects.all().exists() is False
+
+
+@pytest.mark.django_db
+class TestCancelPlanningView:
+    def test_post(self, planning):
+        response = make_request_post(view=CancelPlanningView, data={"planning_id": planning.id})
         assert response.status_code == 302
         assert Planning.objects.all().exists() is False
