@@ -46,7 +46,12 @@ def get_view_path(view):
 
 
 def make_request_get(view):
-    factory = RequestFactory()
     url = get_view_path(view)
-    request = factory.get(url)
+    request = RequestFactory().get(url)
+    return view(request)
+
+
+def make_request_post(view, data: dict):
+    url = get_view_path(view)
+    request = RequestFactory().post(url, data=data)
     return view(request)

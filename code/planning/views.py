@@ -51,6 +51,7 @@ class ResourcesView(TemplateView):
         return context
 
 
+@view(paths="apply_planning", name="apply_planning")
 class ApplyPlanningView(View):
     @timer()
     def post(self, request, *args, **kwargs):

@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch
 from .service import PlanningService
 from .models import Planning, Route, Transport, Shipment
-from .types import EntityType, PlanningRequest
+from .types import EntityType, PlanningRequest, RouteResponse
 
 
 @pytest.mark.django_db
@@ -62,15 +62,18 @@ class TestPlanningService:
         route = Route.objects.create(location_start=transport.location, location_end=shipment.location)
         assert PlanningService().get_route_existing(transport, shipment) == route
 
-    def test_get_route(self, transport, shipment):
-        route = PlanningService().get_route(transport, shipment)
-        assert isinstance(route, Route)
-        assert route.location_start == transport.location
-        assert route.location_end == shipment.location
+    def test_get_route(self, transport, shipment, route):
+        route_response = RouteResponse(polyline=route.polyline, distance_km=route.distance_km)
+        with patch("planning.geo_service.GeoService.get_route", return_value=route_response):
+            route_new = PlanningService().get_route(transport, shipment)
+        assert isinstance(route_new, Route)
+        assert route_new.location_start == transport.location
+        assert route_new.location_end == shipment.location
 
-    def test_apply_planning(self, transport, shipment):
+    def test_apply_planning(self, transport, shipment, route):
         planning_request = PlanningRequest(transport_id=transport.id, shipment_id=shipment.id)
-        PlanningService().apply_planning(planning_request=planning_request)
+        with patch("planning.service.PlanningService.get_route", return_value=route):
+            PlanningService().apply_planning(planning_request=planning_request)
         assert Planning.objects.filter(transport=transport, shipment=shipment).exists()
         assert transport.planned_shipment == shipment
 

@@ -16,12 +16,6 @@ class PlanningSet:
 
 
 @dataclass
-class PlanningRequest:
-    transport_id: str
-    shipment_id: str
-
-
-@dataclass
 class DataclassJSONMixin:
     def get_as_dict(self, json_vals=False) -> dict[str, Any]:
         fields_dict = {}
@@ -57,6 +51,12 @@ class DjangoChoicesEnum(Enum):
 class EntityType(DjangoChoicesEnum):
     TRANSPORT = "transport"
     SHIPMENT = "shipment"
+
+
+@dataclass
+class PlanningRequest(DataclassJSONMixin):
+    transport_id: str
+    shipment_id: str
 
 
 @dataclass
