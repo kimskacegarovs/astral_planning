@@ -13,7 +13,12 @@ from .service import PlanningService
 from .types import EntityType, LocationSearchResult, DataImportParsingOptions, PlanningRequest
 
 
-@view(paths="planning/", name="planning/")
+@view(paths="", name="landing")
+class LandingView(TemplateView):
+    template_name = "home.html"
+
+
+@view(paths="planning", name="planning")
 class PlanningView(TemplateView):
     template_name = "main.html"
 
