@@ -1,8 +1,11 @@
+{% load static %}
+
 <div id="{{ id }}" class="htmx-indicator">
     <div class="flex justify-center">
         <i class="fas fa-spinner fa-spin m-4 fa-2x"></i>
         <span id="counter" class="text-gray-500 m-4 fa-2x"></span>
     </div>
+
 </div>
 
 <script>
@@ -13,10 +16,11 @@
         let startTime = Date.now();
         timerInterval = setInterval(() => {
             const elapsedTime = Date.now() - startTime;
-            document.getElementById('counter').innerText = elapsedTime / 1000 + ' seconds';
-        }, 100);
+            const formattedTime = (elapsedTime / 1000).toFixed(3); // Format time to 3 decimal points
+            document.getElementById('counter').innerText = formattedTime + ' seconds';
+        }, 75);
     };
-
+    
     const observer = new MutationObserver(mutationsList => {
         for (let mutation of mutationsList) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
@@ -31,6 +35,6 @@
         }
     });
 
-    const config = { attributes: true, attributeFilter: ['class'] };
+    const config = {attributes: true, attributeFilter: ['class']};
     observer.observe(targetNode, config);
 </script>

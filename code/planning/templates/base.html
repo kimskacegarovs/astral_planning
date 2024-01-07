@@ -9,6 +9,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="{% static "main.js" %}"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 
     <style>
         table {
@@ -19,7 +20,7 @@
         .htmx-indicator {
             display: none;
             opacity: 0; /* Initially hidden */
-            transition: opacity 0.3s ease-in-out; /* Smooth transition */
+            transition: opacity 0.5s ease-in-out; /* Smooth transition */
         }
 
         .htmx-request .htmx-indicator {
