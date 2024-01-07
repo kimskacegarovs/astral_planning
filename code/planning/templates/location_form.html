@@ -1,20 +1,27 @@
-<div id="location-form-container" class="flex justify-center">
-    <form id="location-form" hx-post="{% url "create_entity" %}" hx-target="#resources">
+<div id="location-form-container" class="flex justify-center m-1">
+
+    <form id="location-form" hx-post="{% url 'create_entity' %}" hx-target="#resources">
         {% csrf_token %}
-        <div class="flex justify-center">
+        <div class="flex flex-wrap">
             {% for field in location_form %}
-                <div>
+                <div class="shrink">
                     {{ field }}
                 </div>
             {% endfor %}
-            <div>{% include "btn.html" with text="Submit" margin="2" %}</div>
+            {% include "btn.html" with text="Submit" margin="2" %}
         </div>
-    </form>
-    {% include "location_search.html" %}
 
-    <a href="#" onclick="openWindow();">
-        {% include "btn.html" with text="Import from spreadsheet" margin=2 %}
-    </a>
+    </form>
+
+<div class="mx-5">
+    {% include "location_search.html" %}
+    </div>
+
+    <div>
+        <a href="#" onclick="openWindow();">
+            {% include "btn.html" with text="Import from spreadsheet" margin=2 %}
+        </a>
+    </div>
 </div>
 
 
@@ -32,8 +39,8 @@
             url, '_blank',
             'width=' + width
             + ',height=' + height
-            //  + ',left=' + left
-            // + ',top=' + top
+            + ',left=' + left
+            + ',top=' + top
         );
     }
 </script>
