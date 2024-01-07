@@ -1,6 +1,6 @@
 import json
 import pytest
-from .models import Location, Route, Planning, LocationSearchResultData
+from .models import Location, Route, Planning
 
 
 @pytest.mark.django_db
@@ -20,23 +20,6 @@ class TestCoordinatesMixin:
         location = Location(latitude=50.0, longitude=200.0)
         with pytest.raises(ValueError):
             location.validate_coordinates()
-
-    @pytest.mark.django_db
-    class TestLocationSearchResultData:
-        def test_as_json(self):
-            search_result = LocationSearchResultData(search_text="Test", display_name="Test", coordinates="50.0,30.0")
-            search_result.save()
-
-            expected_json = str(
-                {
-                    "id": str(search_result.id),
-                    "search_text": "Test",
-                    "display_name": "Test",
-                    "coordinates": "50.0,30.0",
-                }
-            ).replace("'", '"')
-
-            assert search_result.as_json == expected_json
 
 
 @pytest.mark.django_db

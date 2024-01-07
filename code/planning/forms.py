@@ -1,7 +1,6 @@
 from django import forms
-from forms import CharField, ChoiceField, NumberField, TextAreaField
-from validators import validate_coordinates_input
-
+from forms import CharField, ChoiceField, NumberField, TextAreaField, SelectWidget
+from .models import Location
 from .types import EntityType
 
 
@@ -12,8 +11,11 @@ class LocationSearchForm(forms.Form):
 class CreateEntityForm(forms.Form):
     entity_type = ChoiceField(placeholder="Type", choices=EntityType.choices())
     name = CharField(placeholder="Name")
-    address = CharField(placeholder="Address")
-    coordinates = CharField(placeholder="Coordinates", validators=[validate_coordinates_input])
+    location = forms.ModelChoiceField(
+        queryset=Location.objects.all(),
+        empty_label="Select location",
+        widget=SelectWidget,
+    )
 
 
 class DeleteEntityForm(forms.Form):

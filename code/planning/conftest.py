@@ -1,5 +1,5 @@
 import pytest
-from .models import Location, Shipment, Transport, Route, Planning, LocationSearchResultData
+from .models import Location, Shipment, Transport, Route, Planning
 import json
 
 
@@ -29,7 +29,12 @@ def planning(transport, shipment):
 
 
 @pytest.fixture
-def location_search_result_data() -> LocationSearchResultData:
-    return LocationSearchResultData.objects.create(
-        search_text="Amsterdam", display_name="Amsterdam, Netherlands", coordinates="52.3727598,4.8936041"
+def location_search_result_data() -> Location:
+    return Location.objects.create(
+        name="Amsterdam",
+        address="Amsterdam, Netherlands",
+        country_code="NL",
+        postcode="1011",
+        latitude="52.3727598",
+        longitude="4.8936041",
     )

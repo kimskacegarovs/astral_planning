@@ -74,7 +74,7 @@ class TestLocationSearchView:
         with patch("planning.geo_service.GeoService.search", return_value=[return_value]):
             response = make_request_post(view=LocationSearchView, data=form.data)
         assert response.status_code == 200
-        assert return_value.display_name in response.content.decode("utf-8")
+        assert return_value.name in response.content.decode("utf-8")
 
 
 @pytest.mark.django_db
@@ -85,4 +85,4 @@ class TestLocationSearchResultSelectView:
         data = location_search_result_data.as_json
         response = make_request_post(view=LocationSearchResultSelectView, data={"data": form_data, "result": data})
         assert response.status_code == 200
-        assert location_search_result_data.display_name in response.content.decode("utf-8")
+        assert location_search_result_data.name in response.content.decode("utf-8")

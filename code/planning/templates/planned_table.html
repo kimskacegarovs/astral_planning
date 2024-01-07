@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <div class="bg-gray-800 rounded-lg p-4 m-4 w-full">
     <h2 class="text-center px-4 py-2">Planned</h2>
 
@@ -13,14 +14,14 @@
 
             <!-- Grid column 1 -->
             <div class="col-span-5">
-                <div class="bg-gray-700 p-2 rounded text-center w-full truncate">
-                    {{ item.transport.name }} ({{ item.transport.location.address }})
+                <div class="bg-gray-700 p-2 rounded text-center w-full truncate flex justify-center">
+                    {{ item.transport.name }} {% flag_svg item.transport.location.country_code %} {{ item.transport.location }}
                 </div>
             </div>
             <!-- Grid column 2 -->
             <div class="col-span-5">
-                <div class="bg-gray-700 p-2 rounded text-center w-full truncate">
-                    {{ item.shipment.name }} ({{ item.shipment.location.address }})
+                <div class="bg-gray-700 p-2 rounded text-center w-full truncate flex justify-center">
+                    {{ item.shipment.name }} {% flag_svg item.shipment.location.country_code %} {{ item.shipment.location }}
                 </div>
             </div>
             <!-- Grid column 3 -->
