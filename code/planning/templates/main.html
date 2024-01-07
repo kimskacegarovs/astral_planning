@@ -14,7 +14,7 @@
 
     {% include "main_js.html" %}
     {% include "map.html" %}
-    {% include "planning_js.html" %}
+    <script src="{% static 'planning.js' %}"></script>
 
     <form hidden id="planning-form"
           hx-post="{% url 'apply_planning' %}"

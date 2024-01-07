@@ -3,43 +3,39 @@
 {% block title %}Astral Planning - home{% endblock %}
 {% block content %}
 
-<style>
-  /* Animation styles */
-  @keyframes pulse {
-    0%, 100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.05);
-    }
-  }
+    <style>
 
-  /* Glowing effect animation */
-  @keyframes glowing {
-    0% {
-      box-shadow: 0 0 2px 0 rgba(59, 130, 246, 0.75);
-    }
-    50% {
-      box-shadow: 0 0 5px 10px rgba(59, 130, 246, 0.75);
-    }
-    100% {
-      box-shadow: 0 0 2px 0 rgba(59, 130, 246, 0.75);
-    }
-  }
 
-  /* Additional styles for the button */
-  .glow-button {
-    animation: glowing 2s infinite;
-  }
-</style>
+        /* Glowing effect animation */
+        @keyframes glowing {
+            0% {
+                box-shadow: 0 0 2px 0 rgba(71, 106, 161, 0.75);
+            }
+            50% {
+                box-shadow: 0 0 5px 10px rgba(26, 45, 79, 0.75);
+            }
+            100% {
+                box-shadow: 0 0 2px 0 rgba(34, 68, 119, 0.75);
+            }
+        }
 
-<div class="flex items-center justify-center h-screen">
-  <div class="text-center">
-    <h1 class="text-4xl font-bold mb-6">Astral logistics optimisation</h1>
-    <a href="{% url "planning" %}" class="w-4/5 lg:w-3/5 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 text-white font-bold py-16 lg:py-20 px-12 rounded-lg inline-block shadow-lg transition duration-300 transform-gpu hover:scale-105 ease-in-out glow-button">
-        Go to Planning Page
-    </a>
-  </div>
-</div>
+        /* Additional styles for the button */
+        .glow-button {
+            animation: glowing 2s infinite;
+        }
+
+    </style>
+
+    <div class="flex items-center justify-center h-screen">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold mb-6">Astral logistics optimisation</h1>
+            <a href="{% url "planning" %}"
+               class="w-4/5 lg:w-3/5 bg-gradient-to-r from-sky-600 via-sky-700 to-blue-900 text-white font-bold py-16 lg:py-20 px-12 rounded-lg inline-block shadow-lg transition duration-300 transform-gpu hover:scale-105 ease-in-out glow-button">
+                Go to Planning Page
+                <img src="{% static 'astral-logo.svg' %}" alt="Astral logo" class="svg-logo">
+
+            </a>
+        </div>
+    </div>
 
 {% endblock %}
