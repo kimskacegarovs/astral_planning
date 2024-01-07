@@ -15,7 +15,7 @@ from .types import EntityType, LocationSearchResult, DataImportParsingOptions, P
 
 @view(paths="", name="landing")
 class LandingView(TemplateView):
-    template_name = "home.html"
+    template_name = "landing.html"
 
 
 @view(paths="planning", name="planning")
