@@ -1,6 +1,36 @@
 <div id="{{ id }}" class="htmx-indicator">
     <div class="flex justify-center">
         <i class="fas fa-spinner fa-spin m-4 fa-2x"></i>
-        <span id="counter" class="text-gray-500"></span>
+        <span id="counter" class="text-gray-500 m-4 fa-2x"></span>
     </div>
 </div>
+
+<script>
+    const targetNode = document.getElementById('{{ id }}');
+    let timerInterval; // Variable to hold the timer interval
+
+    const startTimer = () => {
+        let startTime = Date.now();
+        timerInterval = setInterval(() => {
+            const elapsedTime = Date.now() - startTime;
+            document.getElementById('counter').innerText = elapsedTime / 1000 + ' seconds';
+        }, 100);
+    };
+
+    const observer = new MutationObserver(mutationsList => {
+        for (let mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                const currentClass = mutation.target.getAttribute('class');
+                if (currentClass && currentClass.split(' ').includes('htmx-request')) {
+                    clearInterval(timerInterval); // Reset previous timer, if any
+                    startTimer(); // Start new timer for the request
+                } else {
+                    clearInterval(timerInterval); // Stop the timer when the request ends
+                }
+            }
+        }
+    });
+
+    const config = { attributes: true, attributeFilter: ['class'] };
+    observer.observe(targetNode, config);
+</script>
