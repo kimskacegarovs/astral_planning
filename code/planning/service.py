@@ -104,3 +104,19 @@ class PlanningService:
                 return Shipment.objects.create(location=location, name=name)
             case EntityType.TRANSPORT:
                 return Transport.objects.create(location=location, name=name)
+
+    @timer()
+    def create_entities(self):
+        Shipment.objects.all().delete()
+        Transport.objects.all().delete()
+
+        count = 120
+        lv_locations = Location.objects.filter(country_code="LV")
+
+        for i in range(count):
+            entity_type = EntityType.SHIPMENT if i % 2 == 0 else EntityType.TRANSPORT
+            self.create_entity(
+                entity_type=entity_type,
+                name=f"{entity_type.name} {i}",
+                location=lv_locations[i],
+            )

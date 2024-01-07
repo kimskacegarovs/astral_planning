@@ -23,6 +23,8 @@ class PlanningView(TemplateView):
     template_name = "main.html"
 
     def get_context_data(self, **kwargs):
+        # GeoService().load_cities_from_file()
+        # PlanningService().create_entities()
         context = super().get_context_data(**kwargs)
         context["apply_planning_url"] = reverse("apply_planning")
         context["location_form"] = CreateEntityForm()

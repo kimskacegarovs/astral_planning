@@ -61,7 +61,6 @@ class PlanningOptimisationService:
         row_indices, col_indices = linear_sum_assignment(cost_matrix)
         return row_indices, col_indices
 
-    @timer()
     def calculate_cost(self, transport: Transport, shipment: Shipment) -> int:
         distance_km = self.get_distance(transport, shipment)
         return distance_km
