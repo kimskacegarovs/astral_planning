@@ -48,15 +48,20 @@ class CoordinatesMixin:
 
 
 class Location(CoordinatesMixin, BaseModel):
+    name = models.CharField(max_length=100, null=True)
     address = models.CharField(max_length=300, null=True)
+    country_code = models.CharField(max_length=2, null=True)
+    postcode = models.CharField(max_length=10, null=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
 
+    @property
+    def search_result_text(self):
+        fields = [self.name, self.address, self.country_code, self.postcode]
+        return ", ".join([f for f in fields if f])
 
-class LocationSearchResultData(BaseModel):
-    search_text = models.CharField(max_length=300, null=True)
-    display_name = models.CharField(max_length=300, null=True)
-    coordinates = models.CharField(max_length=300, null=True)
+    def __str__(self):
+        return self.search_result_text
 
 
 class Shipment(BaseModel):

@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <div class="table bg-gray-800 rounded-lg p-4 m-4 w-full">
     <table class="table-auto w-full">
         <thead>
@@ -8,9 +9,9 @@
         <tbody class="table-content droppable">
         {% for item in items %}
             <tr class="flex">
-                <td class="item draggable bg-gray-700 p-2 rounded mb-2 cursor-move text-center w-full"
+                <td class="item draggable bg-gray-700 p-2 rounded mb-2 cursor-move text-center w-full flex justify-center"
                     draggable="true" id="{{ item.id }}" data-item-type="{{ item_type }}">
-                    {{ item.name }} ({{ item.location.address }})
+                    {{ item.name }} {% flag_svg item.location.country_code %} ({{ item.location }})
                 </td>
                 <td class="flex-auto">
                     <form hx-post="{% url "delete" %}" hx-target="#resources">

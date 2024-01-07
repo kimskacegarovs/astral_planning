@@ -10,7 +10,7 @@ from .forms import CreateEntityForm, DeleteEntityForm, LocationSearchForm, Optim
 from .geo_service import GeoService
 from .models import Location, Shipment, Transport
 from .service import PlanningService
-from .types import EntityType, LocationSearchResult, DataImportParsingOptions, PlanningRequest
+from .types import EntityType, DataImportParsingOptions, PlanningRequest
 
 
 @view(paths="", name="landing")
@@ -95,9 +95,12 @@ class LocationSearchView(FormView):
 class LocationSearchResultSelectView(View):
     def post(self, request, *args, **kwargs):
         location_form_data = json.loads(self.request.POST["data"])
-        result = LocationSearchResult.from_json(self.request.POST["result"])
-        initial = {**location_form_data, "address": result.display_name, "coordinates": result.coordinates}
-        context = {"location_form": CreateEntityForm(initial=initial), "location_search_form": LocationSearchForm()}
+
+        selected_location_id = json.loads(self.request.POST["result"])["id"]
+        selected_location = Location.objects.get(id=selected_location_id)
+
+        location_form = CreateEntityForm(initial={**location_form_data, "location": selected_location})
+        context = {"location_form": location_form, "location_search_form": LocationSearchForm()}
         return render(self.request, "location_form.html", context)
 
 
@@ -107,11 +110,11 @@ class CreateEntityView(FormView):
 
     @timer()
     def form_valid(self, form):
-        name = form.cleaned_data["name"]
-        lat, lng = form.cleaned_data["coordinates"].split(",")
-        location, _ = Location.objects.get_or_create(latitude=lat, longitude=lng, address=form.cleaned_data["address"])
-        entity_type = EntityType(form.cleaned_data["entity_type"])
-        PlanningService().create_entity(name=name, location=location, entity_type=entity_type)
+        PlanningService().create_entity(
+            name=form.cleaned_data["name"],
+            location=form.cleaned_data["location"],
+            entity_type=EntityType(form.cleaned_data["entity_type"]),
+        )
         return redirect("resources")
 
     def form_invalid(self, form):
@@ -200,11 +203,7 @@ class DataImportApplyView(View):
 @view(paths="data_import_create_entity", name="data_import_create_entity")
 class DataImportCreateEntityView(View):
     def post(self, request, *args, **kwargs):
-        name = self.request.POST["name"]
-        location = self.request.POST["location"]
-        coordinates, address = location.split(";")
-        lat, lng = coordinates.split(",")
-
-        location, _ = Location.objects.get_or_create(latitude=lat, longitude=lng, address=address)
-        Shipment.objects.create(location=location, name=name)
+        Shipment.objects.create(
+            location=Location.objects.get(id=self.request.POST["location"]), name=self.request.POST["name"]
+        )
         return render(self.request, "data_import_entity_saved.html")

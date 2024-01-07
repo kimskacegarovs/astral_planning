@@ -7,8 +7,8 @@
             <select name="location"
                     class="w-full col-span-2 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-gray-700">
                 {% for option in result.options %}
-                    <option value="{{ option.coordinates }}; {{ option.display_name }}" class="py-3 bg-gray-600">
-                        {{ option.display_name }} ({{ option.coordinates }})
+                    <option value="{{ option.id }}" class="py-3 bg-gray-600">
+                        {{ option }}
                     </option>
                 {% endfor %}
             </select>

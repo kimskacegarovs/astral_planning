@@ -1,3 +1,5 @@
+{% load static %}
+{% load custom_tags %}
 <ul class="border border-gray-500 rounded" id="location-search-result-container">
     {% for result in search_results %}
         <form id="location-search-result-{{ forloop.counter }}"
@@ -8,7 +10,11 @@
               hx-vals="js:{data: getMergedFormsData(['location-search-result-{{ forloop.counter }}', 'location-form'])}">
             {% csrf_token %}
             <li class="{% cycle 'bg-gray-700' 'bg-gray-800' %} hover:bg-gray-500 transition-colors duration-300 cursor-pointer">
-                {{ result.display_name }}
+
+                <div class="flex">
+                    {% flag_svg result.country_code %}
+                    {{ result.search_result_text }}
+                </div>
             </li>
             <input type="hidden" name="result" value="{{ result.as_json }}">
         </form>

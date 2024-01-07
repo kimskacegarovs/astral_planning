@@ -1,27 +1,28 @@
 from .external_api import OpenStreetMapGeocodingClient, GoogleMapsClient
 from .types import RoutePolylineInput, RouteResponse
-from .models import LocationSearchResultData
+from .models import Location
 from utils import timer
 
 
 class GeoService:
     @timer()
-    def search(self, search: str) -> list[LocationSearchResultData]:
-        if existing_results := LocationSearchResultData.objects.filter(search_text=search):
-            print(f"Found {len(existing_results)} existing results for search '{search}'")
-            return list(existing_results)
+    def search(self, search: str) -> list[Location]:
+        search_results = OpenStreetMapGeocodingClient().search(search=search)
+        search_results = self.create_new_locations(locations=search_results)
+        return search_results
 
-        new_results = LocationSearchResultData.objects.bulk_create(
-            [
-                LocationSearchResultData(
-                    search_text=search,
-                    display_name=result.display_name,
-                    coordinates=result.coordinates,
-                )
-                for result in OpenStreetMapGeocodingClient().search(search)
-            ]
-        )
-        return new_results
+    def create_new_locations(self, locations: list[Location]):
+        result = []
+        for location in locations:
+            existing_location = Location.objects.filter(
+                latitude=location.latitude, longitude=location.longitude, name=location.name
+            )
+            if existing_location:
+                result.append(existing_location.first())
+            else:
+                location.save()
+                result.append(location)
+        return result
 
     def get_route(self, route_input: RoutePolylineInput) -> RouteResponse:
         return GoogleMapsClient().get_route(route_input=route_input)

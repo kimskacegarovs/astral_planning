@@ -5,7 +5,8 @@ import numpy as np
 import polyline
 import requests
 from dotenv import load_dotenv
-from planning.types import LocationSearchResult, RoutePolylineInput, RouteResponse
+from .models import Location
+from planning.types import RoutePolylineInput, RouteResponse
 from utils import is_pytest
 
 load_dotenv()
@@ -14,14 +15,38 @@ load_dotenv()
 class OpenStreetMapGeocodingClient:
     BASE_URL = "https://nominatim.openstreetmap.org"
 
-    def search(self, search: str) -> list[LocationSearchResult]:
+    def get_location_name(self, address: dict) -> str:
+        location_name = None
+        if town := address.get("town"):
+            location_name = town
+        elif city := address.get("city"):
+            location_name = city
+        return location_name
+
+    def get_postcode(self, country_code: str, address: dict) -> str:
+        postcode_full = None
+        if postcode := address.get("postcode"):
+            postcode_full = f"{country_code}-{postcode}" if postcode.isdigit() else postcode
+        return postcode_full
+
+    def search(self, search: str) -> list[Location]:
         url = f"{self.BASE_URL}/search"
-        params = {"format": "json", "q": search}
+        params = {"format": "json", "q": search, "addressdetails": 1, "limit": 5}
         response = requests.get(url, params=params)
         response.raise_for_status()
         results = []
+
         for r in response.json():
-            location = LocationSearchResult(display_name=r["display_name"], coordinates=f"{r['lat']}, {r['lon']}")
+            country_code = r["address"]["country_code"].upper()
+
+            location = Location(
+                name=r["name"],
+                country_code=country_code,
+                address=self.get_location_name(address=r["address"]),
+                postcode=self.get_postcode(country_code=country_code, address=r["address"]),
+                latitude=r["lat"],
+                longitude=r["lon"],
+            )
             results.append(location)
         return results
 

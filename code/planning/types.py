@@ -3,7 +3,7 @@ from dataclasses import dataclass, fields
 from typing import Any
 from enum import Enum
 from django.db.models import QuerySet
-from .models import Planning, Route, Shipment, Transport
+from .models import Planning, Route, Shipment, Transport, Location
 
 
 @dataclass
@@ -60,12 +60,6 @@ class PlanningRequest(DataclassJSONMixin):
 
 
 @dataclass
-class LocationSearchResult(DataclassJSONMixin):
-    display_name: str
-    coordinates: str
-
-
-@dataclass
 class RoutePolylineInput:
     start_lat: float
     start_lon: float
@@ -92,4 +86,4 @@ class RouteResponse:
 class DataImportParsingOptions:
     location: str
     name: str
-    options: list[LocationSearchResult]
+    options: list[Location]
