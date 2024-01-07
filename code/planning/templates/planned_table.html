@@ -48,6 +48,14 @@
                     </form>
                 </div>
             </div>
+            
+            {% empty %}
+                <div class="col-span-12">
+                    <div class="bg-gray-700 p-2 rounded text-center w-full truncate">
+                        No plannings
+                    </div>
+                </div>
+
         {% endfor %}
 
         <div class="text-right col-span-12">
