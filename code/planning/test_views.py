@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import patch
 from .models import Planning
 from .views import (
+    LandingView,
     PlanningView,
     ApplyPlanningView,
     ResetPlanningView,
@@ -13,6 +14,13 @@ from .forms import CreateEntityForm, LocationSearchForm
 from .types import PlanningRequest
 from utils import make_request_get, make_request_post
 import json
+
+
+@pytest.mark.django_db
+class TestLandingView:
+    def test_get(self):
+        response = make_request_get(LandingView)
+        assert response.status_code == 200
 
 
 @pytest.mark.django_db
