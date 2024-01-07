@@ -75,8 +75,10 @@ class CancelPlanningView(View):
         return redirect("resources")
 
 
+@view(paths="location_search", name="location_search")
 class LocationSearchView(FormView):
     form_class = LocationSearchForm
+    template_name = ""
 
     @timer()
     def form_valid(self, form):
