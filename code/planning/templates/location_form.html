@@ -1,31 +1,51 @@
-<div id="location-form-container" class="flex justify-center m-1">
-
-    <form id="location-form" hx-post="{% url 'create_entity' %}" hx-target="#resources">
-        {% csrf_token %}
-        <div class="flex flex-wrap">
-            {% for field in location_form %}
-                <div class="shrink">
-                    {{ field }}
-                </div>
-            {% endfor %}
-            {% include "btn.html" with text="Submit" margin="2" %}
-        </div>
-
-    </form>
-
-<div class="mx-5">
-    {% include "location_search.html" %}
+<div class="bg-gray-800 m-4 p-2 rounded ">
+    <div class="flex justify-center m-1">
+        <button onclick="toggleFormVisibility()">
+            Create entity form
+            <i id="chevron-icon" class="fas fa-chevron-down ml-2"></i>
+        </button>
     </div>
 
-    <div>
-        <a href="#" onclick="openWindow();">
-            {% include "btn.html" with text="Import from spreadsheet" margin=2 %}
-        </a>
+    <div id="location-form-container" class="flex justify-center m-1 hidden">
+        <form id="location-form" hx-post="{% url 'create_entity' %}" hx-target="#resources">
+            {% csrf_token %}
+            <div class="flex flex-wrap">
+                {% for field in location_form %}
+                    <div class="shrink">
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                {% include "btn.html" with text="Submit" margin="2" %}
+            </div>
+
+        </form>
+
+        <div class="mx-5">
+            {% include "location_search.html" %}
+        </div>
+
+        <div>
+            <a href="#" onclick="openWindow();">
+                {% include "btn.html" with text="Import from spreadsheet" margin=2 %}
+            </a>
+        </div>
     </div>
 </div>
 
+<script>
+
+</script>
 
 <script>
+
+    function toggleFormVisibility() {
+        const formContainer = document.getElementById('location-form-container');
+        formContainer.classList.toggle('hidden'); // Toggle the 'hidden' class
+        const chevronIcon = document.getElementById('chevron-icon');
+        chevronIcon.classList.toggle('fa-chevron-down');
+        chevronIcon.classList.toggle('fa-chevron-up');
+    }
+
     function openWindow() {
         const url = "{% url 'data_import' %}";
         const sizeMultiplier = 0.8;
