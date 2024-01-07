@@ -1,13 +1,13 @@
 
 {% load static %}
 <nav class="bg-gray-800 fixed w-full top-0" style="z-index: 99999; border-bottom: 1px solid #8f8f8f;">
-    <div class="container mx-auto px-6 py-1">
+    <div class="container py-1 px-3">
         <div class="flex items-center justify-between">
             <div class="md:flex items-center">
                 <img src="{% static "astral_logo_blue.svg" %}" width="30px" height="30px" class="mr-2">
-                <a class="text-white text-lg font-semibold" href="#">
+                <p class="text-white text-lg font-semibold" style="pointer-events: none">
                     Astral Solutions
-                </a>
+                </p>
                 <ul class="flex ml-10 space-x-4">
                     <li><a class="text-gray-300 hover:text-white" href="{% url "landing" %}">Home</a></li>
                     <li><a class="text-gray-300 hover:text-white" href="{% url "planning" %}">Planning</a></li>
