@@ -25,5 +25,4 @@ urlpatterns = [
     path("", include_view_urls()),
     path("admin/", admin.site.urls),
     path("resources/", planning_views.ResourcesView.as_view(), name="resources"),
-    path("location_search/", planning_views.LocationSearchView.as_view(), name="location_search"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

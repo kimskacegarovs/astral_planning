@@ -1,10 +1,18 @@
 import pytest
 from unittest.mock import patch
 from .models import Planning
-from .views import PlanningView, ApplyPlanningView, ResetPlanningView, CancelPlanningView
+from .views import (
+    PlanningView,
+    ApplyPlanningView,
+    ResetPlanningView,
+    CancelPlanningView,
+    LocationSearchView,
+    LocationSearchResultSelectView,
+)
 from .forms import CreateEntityForm, LocationSearchForm
 from .types import PlanningRequest
 from utils import make_request_get, make_request_post
+import json
 
 
 @pytest.mark.django_db
@@ -48,3 +56,25 @@ class TestCancelPlanningView:
         response = make_request_post(view=CancelPlanningView, data={"planning_id": planning.id})
         assert response.status_code == 302
         assert Planning.objects.all().exists() is False
+
+
+@pytest.mark.django_db
+class TestLocationSearchView:
+    def test_post(self, location_search_result_data):
+        form = LocationSearchForm(data={"search": "Amsterdam"})
+        return_value = location_search_result_data
+        with patch("planning.geo_service.GeoService.search", return_value=[return_value]):
+            response = make_request_post(view=LocationSearchView, data=form.data)
+        assert response.status_code == 200
+        assert return_value.display_name in response.content.decode("utf-8")
+
+
+@pytest.mark.django_db
+class TestLocationSearchResultSelectView:
+    def test_post(self, location_search_result_data):
+        form = LocationSearchForm(data={"search": "Amsterdam"})
+        form_data = json.dumps(form.data)
+        data = location_search_result_data.as_json
+        response = make_request_post(view=LocationSearchResultSelectView, data={"data": form_data, "result": data})
+        assert response.status_code == 200
+        assert location_search_result_data.display_name in response.content.decode("utf-8")
