@@ -1,7 +1,7 @@
-<div id="location-form-container" class="flex justify-center m-1">
+<div id="location-form-container" class="flex justify-center m-3">
     <form id="location-form" hx-post="{% url 'create_entity' %}" hx-target="#resources">
         {% csrf_token %}
-        <div class="flex flex-wrap">
+        <div class="flex flex-wrap justify-center">
             {% for field in location_form %}
                 <div class="shrink">
                     {{ field }}
@@ -12,11 +12,9 @@
 
     </form>
 
-    <div class="mx-5">
-        {% include "location_search.html" %}
-    </div>
+    {% include "location_search.html" %}
 
-    <div>
+    <div class="mx-3">
         <a href="#" onclick="openDataImportWindow();">
             {% include "btn.html" with text="Import from spreadsheet" margin=2 %}
         </a>

@@ -1,0 +1,18 @@
+<div class="flex justify-center">
+    <form hx-post="{% url "apply_optimised_planning" %}"
+          hx-target="#resources"
+          hx-swap="outerHTML"
+          hx-indicator="#loading-resources"
+          class="flex justify-center">
+        {% csrf_token %}
+        {{ optimise_planning_form }}
+        {% include "btn.html" with text="Optimise planning" margin=2 %}
+    </form>
+
+    <form hx-post="{% url "reset_planning" %}"
+          hx-target="#resources"
+          hx-swap="outerHTML">
+        {% csrf_token %}
+        {% include "btn.html" with text="Reset planning" warning="True" margin=2 %}
+    </form>
+</div>

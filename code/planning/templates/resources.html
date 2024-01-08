@@ -1,37 +1,21 @@
 {% load static %}
+
 <div id="resources" class="container mx-auto grid">
+    {% include "optimise_planning.html" %}
+
     <div>
         {% include "planned_table.html" with items=planning_set.plannings total_empty_km=planning_set.total_empty_km %}
     </div>
 
-
-    <div class="flex justify-center">
-        <form hx-post="{% url "apply_optimised_planning" %}"
-              hx-target="#resources"
-              hx-swap="outerHTML"
-              hx-indicator="#loading-resources">
-            {% csrf_token %}
-            {{ optimise_planning_form }}
-            {% include "btn.html" with text="Optimise planning" margin=2 %}
-        </form>
-
-        <form hx-post="{% url "reset_planning" %}"
-              hx-target="#resources"
-              hx-swap="outerHTML">
-            {% csrf_token %}
-            {% include "btn.html" with text="Reset planning" warning="True" margin=2 %}
-        </form>
-    </div>
     <div class="grid grid-cols-2 gap-8">
         {% include "planning_sub_table.html" with title="Transport" items=planning_set.unplanned_transports item_type="transport" %}
         {% include "planning_sub_table.html" with title="Shipment" items=planning_set.unplanned_shipments item_type="shipment" %}
     </div>
 </div>
 
-
-<script src="{% static "map.js" %}"></script>
 {% include "map_js.html" %}
 
 <script>
-    applyDraggable()
+    applyDraggable();
+    setMap();
 </script>
