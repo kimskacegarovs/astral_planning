@@ -1,19 +1,19 @@
-import concurrent.futures
-
 import numpy as np
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from geopy.distance import geodesic
 from scipy.optimize import linear_sum_assignment
 
 from .models import Route, Shipment, Transport
-from utils import timer, is_pytest
+from utils import timer
+from typing import Dict
+from uuid import UUID
+
+
+ExistingRouteDistances = Dict[tuple[UUID, UUID], int]
 
 
 class PlanningOptimisationService:
     DEFAULT_MAX_EMPTY_KM = 3_000
-
-    def __init__(self, concurrency: bool = True):
-        self.CONCURRENT = concurrency if not is_pytest() else False
 
     @timer()
     def optimal_resource_allocation(
@@ -34,25 +34,24 @@ class PlanningOptimisationService:
 
     @timer()
     def get_cost_matrix(self, transports: QuerySet[Transport], shipments: QuerySet[Shipment]) -> np.ndarray:
+        existing_route_distances = self.get_existing_routes(transports, shipments)
+        transport_locations = transports.values_list("location__id", flat=True)
+        shipment_locations = shipments.values_list("location__id", flat=True)
+
         cost_matrix = np.zeros((len(transports), len(shipments)))
 
-        if self.CONCURRENT:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                futures = {
-                    executor.submit(self.calculate_cost, transport, shipment): (i, j)
-                    for i, transport in enumerate(transports)
-                    for j, shipment in enumerate(shipments)
-                }
+        for i, transport_location in enumerate(transport_locations):
+            for j, shipment_location in enumerate(shipment_locations):
+                key = (transport_location, shipment_location)
+                existing_route_distance = existing_route_distances.get(key)
 
-                for future in concurrent.futures.as_completed(futures):
-                    i, j = futures[future]
-                    cost = future.result()
-                    cost_matrix[i][j] = cost
-
-        else:
-            for i, transport in enumerate(transports):
-                for j, shipment in enumerate(shipments):
-                    cost_matrix[i][j] = self.calculate_cost(transport, shipment)
+                if existing_route_distance is not None:
+                    cost_matrix[i, j] = existing_route_distance
+                else:
+                    transport = transports[i]
+                    shipment = shipments[j]
+                    distance_km = self.calculate_distance_geopy(transport, shipment)
+                    cost_matrix[i, j] = distance_km
 
         return cost_matrix
 
@@ -61,17 +60,20 @@ class PlanningOptimisationService:
         row_indices, col_indices = linear_sum_assignment(cost_matrix)
         return row_indices, col_indices
 
-    def calculate_cost(self, transport: Transport, shipment: Shipment) -> int:
-        distance_km = self.get_distance(transport, shipment)
-        return distance_km
+    @timer()
+    def get_existing_routes(
+        self, transports: QuerySet[Transport], shipments: QuerySet[Shipment]
+    ) -> ExistingRouteDistances:
+        existing_routes = Route.objects.filter(
+            Q(location_start__in=transports.values("location")) & Q(location_end__in=shipments.values("location"))
+        ).values("location_start", "location_end", "distance_km")
 
-    def get_distance(self, transport: Transport, shipment: Shipment) -> int:
-        existing_routes = Route.objects.filter(location_start=transport.location, location_end=shipment.location)
-        if existing_routes:
-            return existing_routes.first().distance_km
+        routes_dict: ExistingRouteDistances = {}
+        for route in existing_routes:
+            key = (route["location_start"], route["location_end"])
+            routes_dict[key] = route["distance_km"]
 
-        distance_km = self.calculate_distance_geopy(transport=transport, shipment=shipment)
-        return distance_km
+        return routes_dict
 
     def calculate_distance_geopy(self, transport: Transport, shipment: Shipment) -> int:
         transport_location = transport.location
