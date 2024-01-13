@@ -18,23 +18,39 @@ jobs:
       with:
         python-version: '3.11'
 
+    - name: Create and activate venv
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        source venv/bin/activate
+        pip install --upgrade pip
         pip install -r requirements.txt
+
+    - name: Generate PyO3 module
+      run: |
+        source venv/bin/activate
+        pip install maturin
+        cd code/planning/cost_matrix
+        maturin develop
 
     - name: Set up Django environment
       run: |
+        source venv/bin/activate
         cd code
         python manage.py migrate
 
     - name: Run tests with coverage
       run: |
+        source venv/bin/activate
         cd code
         pytest --cov
 
     - name: Check coverage threshold
       run: |
+        source venv/bin/activate
         cd code
         pytest --cov --cov-report=xml
         coverage=$(grep -oP 'line-rate="[^"]+"' coverage.xml | cut -d'"' -f2)
