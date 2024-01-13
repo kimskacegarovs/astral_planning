@@ -8,6 +8,7 @@ from utils import timer
 from typing import Dict
 from uuid import UUID
 
+import rust_cost_matrix  # pyO3 rust module
 
 ExistingRouteDistances = Dict[tuple[UUID, UUID], int]
 
@@ -31,6 +32,11 @@ class PlanningOptimisationService:
 
         return allocation
 
+    def get_linear_sum_assignment(self, cost_matrix) -> tuple[np.ndarray, np.ndarray]:
+        # Use the Hungarian algorithm to find the optimal assignment.
+        row_indices, col_indices = linear_sum_assignment(cost_matrix)
+        return row_indices, col_indices
+
     @timer()
     def get_cost_matrix(
         self, transports: QuerySet[Transport], shipments: QuerySet[Shipment], max_empty_km: int
@@ -47,25 +53,18 @@ class PlanningOptimisationService:
                 if existing_route_distance := existing_route_distances.get(key):
                     distance_km = existing_route_distance
                 else:
-                    distance_km = self.calculate_distance_geopy(transports[i], shipments[j])
+                    distance_km = self.calculate_distance_rust(transports[i], shipments[j])
 
                 cost_matrix[i, j] = distance_km if distance_km < max_empty_km else 1_000_000
-        return cost_matrix
 
-    def get_linear_sum_assignment(self, cost_matrix) -> tuple[np.ndarray, np.ndarray]:
-        # Use the Hungarian algorithm to find the optimal assignment.
-        row_indices, col_indices = linear_sum_assignment(cost_matrix)
-        return row_indices, col_indices
+        return cost_matrix
 
     @timer()
     def get_existing_routes(
         self, transports: QuerySet[Transport], shipments: QuerySet[Shipment]
     ) -> ExistingRouteDistances:
-        transport_locations = transports.values_list("location", flat=True)
-        shipment_locations = shipments.values_list("location", flat=True)
-
         existing_routes = Route.objects.filter(
-            Q(location_start__in=transport_locations) & Q(location_end__in=shipment_locations)
+            Q(location_start__in=transports.values("location")) & Q(location_end__in=shipments.values("location"))
         ).values("location_start", "location_end", "distance_km")
 
         routes_dict: ExistingRouteDistances = {}
@@ -74,6 +73,15 @@ class PlanningOptimisationService:
             routes_dict[key] = route["distance_km"]
 
         return routes_dict
+
+    def calculate_distance_rust(self, transport: Transport, shipment: Shipment) -> int:
+        distance_km = rust_cost_matrix.calculate_distance(
+            transport.location.latitude,
+            transport.location.longitude,
+            shipment.location.latitude,
+            shipment.location.longitude,
+        )
+        return round(distance_km)
 
     def calculate_distance_geopy(self, transport: Transport, shipment: Shipment) -> int:
         transport_location = transport.location
