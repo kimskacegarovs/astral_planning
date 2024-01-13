@@ -33,44 +33,32 @@ class PlanningService:
 
     @timer()
     def get_center_coordinate(self, planning_set: PlanningSet) -> Optional[list[float]]:
-        planned_transport_lats = planning_set.plannings.values_list("transport__location__latitude", flat=True)
-        planned_transport_lons = planning_set.plannings.values_list("transport__location__longitude", flat=True)
-
-        planned_shipment_lats = planning_set.plannings.values_list("shipment__location__latitude", flat=True)
-        planned_shipment_lons = planning_set.plannings.values_list("shipment__location__longitude", flat=True)
-
-        unplanned_transport_lats = planning_set.unplanned_transports.values_list("location__latitude", flat=True)
-        unplanned_transport_lons = planning_set.unplanned_transports.values_list("location__longitude", flat=True)
-
-        unplanned_shipment_lats = planning_set.unplanned_shipments.values_list("location__latitude", flat=True)
-        unplanned_shipment_lons = planning_set.unplanned_shipments.values_list("location__longitude", flat=True)
-
-        def sum_qs(qs1, qs2, qs3, qs4) -> int:
-            return sum(list(qs1) + list(qs2) + list(qs3) + list(qs4))
-
-        num_coords = (
-            len(planned_transport_lats)
-            + len(planned_shipment_lats)
-            + len(unplanned_transport_lats)
-            + len(unplanned_shipment_lats)
+        avg_coordinates = self.get_avg_coordinate(
+            lats=[
+                planning_set.plannings.values_list("transport__location__latitude", flat=True),
+                planning_set.plannings.values_list("shipment__location__latitude", flat=True),
+                planning_set.unplanned_transports.values_list("location__latitude", flat=True),
+                planning_set.unplanned_shipments.values_list("location__latitude", flat=True),
+            ],
+            lons=[
+                planning_set.plannings.values_list("transport__location__longitude", flat=True),
+                planning_set.plannings.values_list("shipment__location__longitude", flat=True),
+                planning_set.unplanned_transports.values_list("location__longitude", flat=True),
+                planning_set.unplanned_shipments.values_list("location__longitude", flat=True),
+            ],
         )
-        if num_coords > 0:
-            avg_lat = (
-                sum_qs(
-                    planned_transport_lats, planned_shipment_lats, unplanned_transport_lats, unplanned_shipment_lats
-                )
-                / num_coords
-            )
+        return avg_coordinates
 
-            avg_lon = (
-                sum_qs(
-                    planned_transport_lons, planned_shipment_lons, unplanned_transport_lons, unplanned_shipment_lons
-                )
-                / num_coords
-            )
+    def get_avg_coordinate(self, lats: list[QuerySet], lons: list[QuerySet]) -> list[float]:
+        if len(lats) == 0:
+            return [0, 0]
+        avg_lat = self.sum_coordinate_qs(lats)
+        avg_lon = self.sum_coordinate_qs(lons)
+        return [avg_lat, avg_lon]
 
-            return [avg_lat, avg_lon]
-        return [0, 0]
+    def sum_coordinate_qs(self, querysets: list[QuerySet]) -> float:
+        coords = [coord for qs in querysets for coord in qs]
+        return sum(coords) / len(coords)
 
     def assign_existing_routes(self, plannings: QuerySet[Planning]) -> None:
         for planning in plannings:
