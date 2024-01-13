@@ -28,8 +28,9 @@ jobs:
         pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Activate venv and generate PyO3 module
+    - name: Generate PyO3 module
       run: |
+        source venv/bin/activate
         pip install maturin
         maturin develop
 
