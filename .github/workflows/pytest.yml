@@ -42,11 +42,13 @@ jobs:
 
     - name: Run tests with coverage
       run: |
+        source venv/bin/activate
         cd code
         pytest --cov
 
     - name: Check coverage threshold
       run: |
+        source venv/bin/activate
         cd code
         pytest --cov --cov-report=xml
         coverage=$(grep -oP 'line-rate="[^"]+"' coverage.xml | cut -d'"' -f2)
