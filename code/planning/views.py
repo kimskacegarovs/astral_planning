@@ -23,6 +23,8 @@ class PlanningView(TemplateView):
     template_name = "main.html"
 
     def get_context_data(self, **kwargs):
+        # GeoService().load_cities_from_file()
+        # PlanningService().create_entities()
         context = super().get_context_data(**kwargs)
         context["apply_planning_url"] = reverse("apply_planning")
         context["location_form"] = CreateEntityForm()
@@ -36,24 +38,48 @@ class ResourcesView(TemplateView):
     @timer()
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        apply_optimised_planning = self.request.session.get("apply_optimised_planning", False)
+        max_empty_km = self.request.session.get("max_empty_km")
         planning_set = PlanningService().get_planning_set()
 
-        # TODO Move to service
         plannings_without_routes = planning_set.plannings.filter(route__isnull=True)
-        if apply_optimised_planning and plannings_without_routes:
-            print("Received all routes. Applying optimal planning.")
-            PlanningService().reset_planning()
-            PlanningService().apply_optimal_planning(max_empty_km=self.request.session.get("max_empty_km"))
-            planning_set = PlanningService().get_planning_set()
-            self.request.session["apply_optimised_planning"] = False
+        plannings_without_routes_exist = plannings_without_routes.exists()
+        print("plannings_without_routes_exist", plannings_without_routes_exist)
+
+        if self.request.session.get("routes_to_be_requested"):
+            print("routes_to_be_requested", self.request.session.get("routes_to_be_requested"))
+            if not plannings_without_routes_exist:
+                del self.request.session["routes_to_be_requested"]
+            else:
+                all_routes_fetched = self.fetch_remaining_routes(plannings_without_routes)
+                if all_routes_fetched:
+                    del self.request.session["routes_to_be_requested"]
+                else:
+                    context["routes_to_be_requested"] = True
+
+        elif plannings_without_routes_exist:
+            context["routes_to_be_requested"] = True
+            self.request.session["routes_to_be_requested"] = True
 
         context["planning_set"] = planning_set
         context["planning_polylines"] = PlanningService().get_planning_polylines(planning_set)
-        context["optimise_planning_form"] = OptimisePlanningForm(
-            initial={"max_empty_km": self.request.session.get("max_empty_km")}
-        )
+        context["center_coordinate"] = PlanningService().get_center_coordinate(planning_set)
+        context["optimise_planning_form"] = OptimisePlanningForm(initial={"max_empty_km": max_empty_km})
         return context
+
+    @timer()
+    def fetch_remaining_routes(self, plannings_without_routes):
+        count_routes_to_request = len(plannings_without_routes)
+        max_routes_to_be_requested = 10
+        routes_fetched = 0
+
+        for i in range(count_routes_to_request):
+            if i < max_routes_to_be_requested:
+                PlanningService().request_route(planning=plannings_without_routes[i])
+                routes_fetched += 1
+
+        print(f"Routes fetched: {routes_fetched}/{count_routes_to_request}")
+        all_fetched = routes_fetched == count_routes_to_request
+        return all_fetched
 
 
 @view(paths="apply_planning", name="apply_planning")

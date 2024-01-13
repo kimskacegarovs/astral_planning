@@ -19,12 +19,3 @@
 <div id="map-container">
     <div id="mapid"></div>
 </div>
-
-<script>
-    const mymap = L.map('mapid').setView([49.527683209928554, 15.976826132525256], 3);
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(mymap);
-</script>

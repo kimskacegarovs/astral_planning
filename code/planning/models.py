@@ -105,3 +105,6 @@ class Planning(BaseModel):
     shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
     transport = models.ForeignKey(Transport, on_delete=models.CASCADE)
     route = models.ForeignKey(Route, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"Transport: {self.transport.name} - Shipment: {self.shipment.name}"

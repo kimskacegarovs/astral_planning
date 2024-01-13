@@ -20,6 +20,19 @@
         {% endfor %}
     ];
     var plannedLines = JSON.parse('{{ planning_polylines }}');
+    
+    
+    var centerCoordinate = [48.95131393590893, 21.134053373262336];
+    var mapZoom = 3;
+
+    var newCenterCoordinate = JSON.parse('{{ center_coordinate }}');
+    if (newCenterCoordinate[0] !== 0 && newCenterCoordinate[1] !== 0) {
+        centerCoordinate = newCenterCoordinate;
+        mapZoom = 6;
+    }
+
+
+    
 </script>
 
 <style>

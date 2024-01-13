@@ -1,6 +1,7 @@
 from django.db.models import QuerySet, Sum
 from django.db import transaction
 from utils import timer
+from typing import Optional
 
 from .geo_service import GeoService
 from .models import Planning, Route, Shipment, Transport, Location
@@ -29,6 +30,35 @@ class PlanningService:
             routes=routes,
             total_empty_km=total_empty_km,
         )
+
+    @timer()
+    def get_center_coordinate(self, planning_set: PlanningSet) -> Optional[list[float]]:
+        avg_coordinates = self.get_avg_coordinate(
+            lats=[
+                planning_set.plannings.values_list("transport__location__latitude", flat=True),
+                planning_set.plannings.values_list("shipment__location__latitude", flat=True),
+                planning_set.unplanned_transports.values_list("location__latitude", flat=True),
+                planning_set.unplanned_shipments.values_list("location__latitude", flat=True),
+            ],
+            lons=[
+                planning_set.plannings.values_list("transport__location__longitude", flat=True),
+                planning_set.plannings.values_list("shipment__location__longitude", flat=True),
+                planning_set.unplanned_transports.values_list("location__longitude", flat=True),
+                planning_set.unplanned_shipments.values_list("location__longitude", flat=True),
+            ],
+        )
+        return avg_coordinates
+
+    def get_avg_coordinate(self, lats: list[QuerySet], lons: list[QuerySet]) -> list[float]:
+        if len(lats) == 0:
+            return [0, 0]
+        avg_lat = self.sum_coordinate_qs(lats)
+        avg_lon = self.sum_coordinate_qs(lons)
+        return [avg_lat, avg_lon]
+
+    def sum_coordinate_qs(self, querysets: list[QuerySet]) -> float:
+        coords = [coord for qs in querysets for coord in qs]
+        return sum(coords) / len(coords)
 
     def assign_existing_routes(self, plannings: QuerySet[Planning]) -> None:
         for planning in plannings:
@@ -92,9 +122,10 @@ class PlanningService:
         with transaction.atomic():
             Planning.objects.bulk_create(plannings)
 
-    def request_route(self, planning_id: str):
-        if (planning := Planning.objects.filter(id=planning_id).first()) is None:
-            return planning  # Handle concurrent planning resets
+    def request_route(self, planning: Optional[Planning] = None, planning_id: Optional[str] = None) -> None:
+        if not any([planning, planning_id]):
+            raise ValueError("Either planning or planning_id must be provided")
+        planning = Planning.objects.get(id=planning_id) if not planning else planning
         planning.route = self.get_route(planning.transport, planning.shipment)
         planning.save()
 
@@ -104,3 +135,19 @@ class PlanningService:
                 return Shipment.objects.create(location=location, name=name)
             case EntityType.TRANSPORT:
                 return Transport.objects.create(location=location, name=name)
+
+    @timer()
+    def create_entities(self):
+        Shipment.objects.all().delete()
+        Transport.objects.all().delete()
+
+        count = 120
+        lv_locations = Location.objects.filter(country_code="LV")
+
+        for i in range(count):
+            entity_type = EntityType.SHIPMENT if i % 2 == 0 else EntityType.TRANSPORT
+            self.create_entity(
+                entity_type=entity_type,
+                name=f"{entity_type.name} {i}",
+                location=lv_locations[i],
+            )

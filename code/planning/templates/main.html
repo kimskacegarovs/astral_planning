@@ -11,8 +11,8 @@
             crossorigin=""></script>
 
     <script src="https://unpkg.com/leaflet-ant-path" type="text/javascript"></script>
-    {% include "map.html" %}
     <script src="{% static 'planning.js' %}"></script>
+    <script src="{% static "map.js" %}"></script>
 
     <form hidden id="planning-form"
           hx-post="{% url 'apply_planning' %}"
@@ -22,6 +22,7 @@
           hx-target="#resources">
         {% csrf_token %}
     </form>
+    {% include "map.html" %}
 
     {% include "location_form.html" %}
     {% include "loading_indicator.html" with id="loading-resources" %}

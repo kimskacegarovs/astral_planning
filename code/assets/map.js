@@ -72,13 +72,26 @@ function getRandomColor() {
     return color;
 }
 
+const mapContainerId = 'mapid';
+let mymap = undefined;
+
+function initMap() {
+    mymap = L.map(mapContainerId).setView(centerCoordinate, mapZoom);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(mymap);
+
+    return mymap;
+}
+
 function setMap() {
-    removeExistingMapLayers()
+    if (mymap !== undefined) mymap.remove();
+    initMap();
     addMapMarkerPopup(coordinatesRawPlannedTransport, mapMaprkerIcons.plannedTransport)
     addMapMarkerPopup(coordinatesRawPlannedShipments, mapMaprkerIcons.plannedShipment)
     addMapMarkerPopup(coordinatesRawTransport, mapMaprkerIcons.transport)
     addMapMarkerPopup(coordinatesRawShipments, mapMaprkerIcons.shipment)
     addMapLines(plannedLines)
 }
-
-setMap()
