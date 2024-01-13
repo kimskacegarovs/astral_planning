@@ -30,8 +30,6 @@ jobs:
 
     - name: Activate venv and generate PyO3 module
       run: |
-        cd code
-        source venv/bin/activate
         pip install maturin
         maturin develop
 
