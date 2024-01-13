@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from planning.optimisation import PlanningOptimisationService
-from planning.models import Shipment, Transport, Location, Route
+from planning.models import Shipment, Transport, Location
 
 
 @pytest.mark.django_db
@@ -33,40 +33,6 @@ class TestPlanningOptimisationService:
         )
         assert distance_km == 0
 
-    def test_get_distance_no_existing_route(self, location_new_york, location_los_angeles, geopy_ny_to_la_km):
-        # Given no Route instances stored for given locations
-        Route.objects.all().delete()
-
-        # When get_distance is called
-        distance_km = PlanningOptimisationService().get_distance(
-            transport=Transport(name="", location=location_new_york),
-            shipment=Shipment(name="", location=location_los_angeles),
-        )
-
-        # Then geopy distance is returned
-        assert distance_km == geopy_ny_to_la_km
-
-    def test_get_distance_existing_route(self, location_new_york, location_los_angeles):
-        # Given Route instance stored for given locations
-        route_distance_km = 123
-        location_new_york.save()
-        location_los_angeles.save()
-        Route.objects.create(
-            location_start=location_new_york,
-            location_end=location_los_angeles,
-            polyline="",
-            distance_km=route_distance_km,
-        )
-
-        # When get_distance is called
-        distance_km = PlanningOptimisationService().get_distance(
-            transport=Transport(name="", location=location_new_york),
-            shipment=Shipment(name="", location=location_los_angeles),
-        )
-
-        # Then distance from Route is returned
-        assert distance_km == route_distance_km
-
     def test_get_linear_sum_assignment(self):
         # Given cost matrix
         cost_matrix = np.array([[4, 1, 3], [2, 0, 5], [3, 2, 2]])
@@ -93,7 +59,7 @@ class TestPlanningOptimisationService:
         shipment_2 = Shipment.objects.create(name="shipment_3", location=location_2)
 
         # When optimal_resource_allocation is called
-        allocation = PlanningOptimisationService(concurrency=False).optimal_resource_allocation(
+        allocation = PlanningOptimisationService().optimal_resource_allocation(
             transports=Transport.objects.all(),
             shipments=Shipment.objects.all(),
         )
