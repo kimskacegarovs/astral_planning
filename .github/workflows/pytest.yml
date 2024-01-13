@@ -32,6 +32,7 @@ jobs:
       run: |
         source venv/bin/activate
         pip install maturin
+        cd code/planning/cost_matrix
         maturin develop
 
     - name: Set up Django environment
