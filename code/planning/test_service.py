@@ -32,8 +32,11 @@ class TestPlanningService:
     def test_assign_existing_routes(self, planning, route):
         assert planning.route is None
 
-        with patch("planning.service.PlanningService.get_route_existing", return_value=route):
-            PlanningService().assign_existing_routes(plannings=Planning.objects.all())
+        route.location_start = planning.transport.location
+        route.location_end = planning.shipment.location
+        route.save()
+
+        PlanningService().assign_existing_routes(plannings=Planning.objects.all())
         planning.refresh_from_db()
         assert planning.route == route
 

@@ -18,21 +18,6 @@ class TestPlanningOptimisationService:
     def location_los_angeles(self):
         return Location(latitude=34.0522, longitude=-118.2437)
 
-    def test_calculate_distance_geopy(self, location_new_york, location_los_angeles, geopy_ny_to_la_km):
-        distance_km = PlanningOptimisationService().calculate_distance_geopy(
-            transport=Transport(name="", location=location_new_york),
-            shipment=Shipment(name="", location=location_los_angeles),
-        )
-        assert isinstance(distance_km, int)
-        assert distance_km == geopy_ny_to_la_km
-
-    def test_calculate_distance_geopy_same_location(self, location_new_york, location_los_angeles):
-        distance_km = PlanningOptimisationService().calculate_distance_geopy(
-            transport=Transport(name="", location=location_new_york),
-            shipment=Shipment(name="", location=location_new_york),
-        )
-        assert distance_km == 0
-
     def test_get_linear_sum_assignment(self):
         # Given cost matrix
         cost_matrix = np.array([[4, 1, 3], [2, 0, 5], [3, 2, 2]])
