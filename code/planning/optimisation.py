@@ -7,7 +7,7 @@ from utils import timer
 from typing import Dict
 from uuid import UUID
 
-import rust_cost_matrix  # pyO3 rust module
+import rust_extensions
 
 ExistingRouteDistances = Dict[tuple[UUID, UUID], int]
 
@@ -74,7 +74,7 @@ class PlanningOptimisationService:
         return routes_dict
 
     def calculate_distance_rust(self, transport: Transport, shipment: Shipment) -> int:
-        distance_km = rust_cost_matrix.calculate_distance(
+        distance_km = rust_extensions.calculate_distance(
             transport.location.latitude,
             transport.location.longitude,
             shipment.location.latitude,
