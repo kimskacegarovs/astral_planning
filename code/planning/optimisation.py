@@ -1,6 +1,5 @@
 import numpy as np
 from django.db.models import QuerySet, Q
-from geopy.distance import geodesic
 from scipy.optimize import linear_sum_assignment
 
 from .models import Route, Shipment, Transport
@@ -81,10 +80,4 @@ class PlanningOptimisationService:
             shipment.location.latitude,
             shipment.location.longitude,
         )
-        return round(distance_km)
-
-    def calculate_distance_geopy(self, transport: Transport, shipment: Shipment) -> int:
-        transport_location = transport.location
-        order_location = shipment.location
-        distance_km = geodesic(transport_location.coordinates, order_location.coordinates).km
         return round(distance_km)

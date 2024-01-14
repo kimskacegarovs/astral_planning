@@ -31,7 +31,6 @@ class PlanningService:
             total_empty_km=total_empty_km,
         )
 
-    @timer()
     def get_center_coordinate(self, planning_set: PlanningSet) -> Optional[list[float]]:
         avg_coordinates = self.get_avg_coordinate(
             lats=[
@@ -61,10 +60,26 @@ class PlanningService:
         return sum(coords) / len(coords)
 
     def assign_existing_routes(self, plannings: QuerySet[Planning]) -> None:
+        existing_routes_dict = self.get_existing_routes_dict(plannings)
+
         for planning in plannings:
-            if existing_route := self.get_route_existing(planning.transport, planning.shipment):
+            existing_route = existing_routes_dict.get((planning.transport.location_id, planning.shipment.location_id))
+            if existing_route:
                 planning.route = existing_route
-                planning.save()
+
+        Planning.objects.bulk_update(plannings, ["route"])
+        return
+
+    def get_existing_routes_dict(self, plannings: QuerySet[Planning]) -> dict[tuple[int, int], Route]:
+        transport_ids = [planning.transport.location_id for planning in plannings]
+        shipment_ids = [planning.shipment.location_id for planning in plannings]
+
+        existing_routes = Route.objects.filter(
+            location_start__in=transport_ids, location_end__in=shipment_ids
+        ).select_related("location_start", "location_end")
+
+        existing_routes_dict = {(route.location_start_id, route.location_end_id): route for route in existing_routes}
+        return existing_routes_dict
 
     def get_planning_polylines(self, planning_set: PlanningSet) -> list[list[list[float]]]:
         return [route.polyline_array for route in planning_set.routes]
@@ -83,12 +98,6 @@ class PlanningService:
         # TODO This should be filtered by identifier (user or session)
         Planning.objects.all().delete()
 
-    def get_route_existing(self, transport: Transport, shipment: Shipment) -> Route | None:
-        existing_routes = Route.objects.filter(location_start=transport.location, location_end=shipment.location)
-        if existing_routes:
-            return existing_routes.first()
-        return None
-
     def get_route(self, transport: Transport, shipment: Shipment) -> Route:
         if existing_route := self.get_route_existing(transport, shipment):
             return existing_route
@@ -106,6 +115,12 @@ class PlanningService:
             polyline=route.polyline,
             distance_km=route.distance_km,
         )
+
+    def get_route_existing(self, transport: Transport, shipment: Shipment) -> Route | None:
+        existing_routes = Route.objects.filter(location_start=transport.location, location_end=shipment.location)
+        if existing_routes:
+            return existing_routes.first()
+        return None
 
     @timer()
     def apply_optimal_planning(self, max_empty_km: int = None):
